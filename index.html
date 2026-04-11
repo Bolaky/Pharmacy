@@ -25,15 +25,21 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Tajawal', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-  .header {
-    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--primary-light) 100%);
-    padding: 28px 20px 40px; text-align: center; position: relative; overflow: hidden;
-  }
+  /* Header */
+  .header { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--primary-light) 100%); padding: 24px 20px 40px; text-align: center; position: relative; overflow: hidden; }
   .header::before { content:''; position:absolute; top:-40px; left:-40px; width:200px; height:200px; border-radius:50%; background:rgba(255,255,255,0.04); }
   .header::after { content:''; position:absolute; bottom:-60px; right:-30px; width:250px; height:250px; border-radius:50%; background:rgba(255,255,255,0.04); }
-  .header-icon { font-size:40px; margin-bottom:8px; display:block; }
+  .header-icon { font-size:40px; margin-bottom:6px; display:block; }
   .header h1 { color:#fff; font-size:22px; font-weight:800; margin-bottom:4px; }
   .header p { color:rgba(255,255,255,0.75); font-size:13px; font-weight:300; }
+
+  /* شريط التوريدات */
+  .ticker-wrap { background:rgba(0,0,0,0.2); padding:6px 0; overflow:hidden; white-space:nowrap; }
+  .ticker { display:inline-block; animation: ticker 30s linear infinite; }
+  .ticker:hover { animation-play-state: paused; }
+  @keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+  .ticker-item { display:inline-block; padding:0 24px; font-size:12px; color:rgba(255,255,255,0.9); }
+  .ticker-item span { color:#7fffcf; font-weight:700; }
 
   /* تنويه */
   .notice-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center; padding:20px; }
@@ -46,11 +52,14 @@
 
   /* Search */
   .search-container { padding:0 16px; margin-top:-22px; position:relative; z-index:10; }
-  .search-box { background:#fff; border-radius:16px; box-shadow:0 4px 24px rgba(10,110,92,0.15); padding:14px 18px; display:flex; align-items:center; gap:10px; }
+  .search-box { background:#fff; border-radius:16px; box-shadow:0 4px 24px rgba(10,110,92,0.15); padding:12px 16px; display:flex; align-items:center; gap:8px; }
   .search-icon { color:var(--primary); font-size:18px; flex-shrink:0; }
   .search-box input { flex:1; border:none; outline:none; font-family:'Tajawal',sans-serif; font-size:16px; color:var(--text); background:transparent; }
   .search-box input::placeholder { color:#aab8b5; }
   .clear-btn { background:none; border:none; cursor:pointer; color:#aab8b5; font-size:18px; padding:2px; display:none; }
+  .mic-btn { background:none; border:none; cursor:pointer; font-size:20px; padding:2px; flex-shrink:0; transition:all 0.2s; }
+  .mic-btn.listening { animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
   .filters { padding:16px 16px 0; display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; }
   .filters::-webkit-scrollbar { display:none; }
@@ -64,7 +73,7 @@
   .cards-container { padding:0 16px 100px; display:flex; flex-direction:column; gap:12px; }
 
   /* Card */
-  .drug-card { background:var(--card); border-radius:16px; padding:16px; box-shadow:var(--shadow); border-right:4px solid transparent; transition:transform 0.15s; animation:fadeIn 0.3s ease; cursor:pointer; }
+  .drug-card { background:var(--card); border-radius:16px; padding:16px; box-shadow:var(--shadow); border-right:4px solid transparent; transition:transform 0.15s; animation:fadeIn 0.3s ease; }
   @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
   .drug-card:active { transform:scale(0.98); }
   .drug-card.available { border-right-color:var(--available); }
@@ -72,10 +81,10 @@
   .drug-card.limited { border-right-color:var(--limited); }
   .drug-card.unlisted { border-right-color:var(--unlisted); }
 
-  .card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; gap:10px; }
+  .card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; gap:10px; cursor:pointer; }
   .card-trade-names { font-size:16px; font-weight:800; color:var(--text); line-height:1.4; flex:1; }
   .card-trade-names .matched { color:var(--primary); }
-  .card-active-name { font-size:12px; color:var(--text-muted); margin-bottom:8px; }
+  .card-active-name { font-size:12px; color:var(--text-muted); margin-bottom:8px; cursor:pointer; }
 
   .status-badge { flex-shrink:0; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:700; white-space:nowrap; }
   .status-badge.available { background:#e8f5f0; color:var(--available); }
@@ -83,13 +92,20 @@
   .status-badge.limited { background:#fef9e7; color:var(--limited); }
   .status-badge.unlisted { background:#e8f4fd; color:var(--unlisted); }
 
-  .trade-names { font-size:12px; color:var(--text-muted); line-height:1.6; border-top:1px solid var(--border); padding-top:8px; margin-bottom:8px; }
+  .trade-names { font-size:12px; color:var(--text-muted); line-height:1.6; border-top:1px solid var(--border); padding-top:8px; margin-bottom:8px; cursor:pointer; }
   .trade-names-label { font-weight:600; color:var(--text); margin-bottom:3px; display:block; }
   .trade-name-tag { display:inline-block; background:#f0f0f0; padding:2px 8px; border-radius:6px; margin:2px; font-size:11px; color:#444; }
   .trade-name-tag.highlight { background:#fff3cd; color:#856404; }
 
-  .pin-btn { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border); background:#fff; font-family:'Tajawal',sans-serif; font-size:12px; font-weight:600; color:var(--text-muted); cursor:pointer; transition:all 0.2s; }
+  /* أزرار الكارت */
+  .card-actions { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+  .card-action-btn { flex:1; min-width:70px; padding:7px 8px; border-radius:10px; border:1.5px solid var(--border); background:#fff; font-family:'Tajawal',sans-serif; font-size:11px; font-weight:600; color:var(--text-muted); cursor:pointer; transition:all 0.2s; text-align:center; }
+  .card-action-btn:hover { border-color:var(--primary); color:var(--primary); background:var(--accent); }
+
+  /* زر التثبيت */
+  .pin-btn { width:100%; padding:9px; border-radius:12px; border:1.5px solid var(--border); background:#fff; font-family:'Tajawal',sans-serif; font-size:13px; font-weight:700; color:var(--text-muted); cursor:pointer; transition:all 0.2s; text-align:center; margin-top:10px; }
   .pin-btn.pinned { background:#fff8e1; border-color:#f9a825; color:#f9a825; }
+
   .card-footer { margin-top:8px; font-size:11px; color:#aab8b5; display:flex; align-items:center; gap:4px; }
 
   /* Toast */
@@ -134,6 +150,37 @@
   .coming-soon { text-align:center; padding:20px; color:#ccc; font-size:13px; }
   .coming-soon span { font-size:28px; display:block; margin-bottom:8px; }
 
+  /* رسالة الدعاء */
+  .prayer-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:1001; align-items:center; justify-content:center; padding:20px; }
+  .prayer-overlay.show { display:flex; }
+  .prayer-box { background:linear-gradient(135deg, #075044, #0a6e5c); border-radius:20px; padding:32px 24px; max-width:340px; width:100%; text-align:center; box-shadow:0 8px 32px rgba(0,0,0,0.3); }
+  .prayer-icon { font-size:48px; display:block; margin-bottom:12px; }
+  .prayer-title { font-size:20px; font-weight:800; color:#fff; margin-bottom:12px; line-height:1.6; }
+  .prayer-btn { width:100%; padding:13px; background:rgba(255,255,255,0.2); color:#fff; border:2px solid rgba(255,255,255,0.4); border-radius:12px; font-family:'Tajawal',sans-serif; font-size:15px; font-weight:700; cursor:pointer; margin-top:8px; }
+
+  /* تحذير البدائل */
+  .alts-warning { background:#fff3cd; border:2px solid #f9a825; border-radius:10px; padding:12px 14px; margin-bottom:12px; font-size:13px; color:#856404; line-height:1.7; }
+  .alts-warning strong { display:block; margin-bottom:4px; font-size:14px; }
+
+  /* لا يوجد بديل */
+  .no-alt { text-align:center; padding:16px; color:var(--text-muted); font-size:14px; }
+  .alt-item { display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:#f8f8f8; border-radius:10px; margin-bottom:6px; font-size:13px; }
+  .alt-name { font-weight:600; color:var(--text); }
+  .alt-badge { padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; }
+  .alt-badge.available { background:#e8f5f0; color:var(--available); }
+  .alt-badge.unavailable { background:#fdecea; color:var(--unavailable); }
+  .alt-badge.limited { background:#fef9e7; color:var(--limited); }
+  .alt-badge.unlisted { background:#e8f4fd; color:var(--unlisted); }
+  .alt-section-label { font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:6px; margin-top:10px; }
+
+  /* فيديو */
+  .video-container { position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:10px; }
+  .video-container iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:none; border-radius:10px; }
+
+  /* نصائح وتحذيرات */
+  .tips-text { font-size:14px; color:var(--text); line-height:1.8; }
+  .warning-text { font-size:14px; color:#c0392b; line-height:1.8; }
+
   /* Form */
   .form-page { padding:16px 16px 100px; }
   .form-card { background:#fff; border-radius:16px; padding:20px; box-shadow:var(--shadow); }
@@ -163,6 +210,15 @@
 </head>
 <body>
 
+<!-- رسالة الدعاء -->
+<div class="prayer-overlay" id="prayerOverlay">
+  <div class="prayer-box">
+    <span class="prayer-icon">🤲</span>
+    <div class="prayer-title">برجاء الدعاء<br>لا تنسونا من صالح دعائكم</div>
+    <button class="prayer-btn" onclick="closePrayer()">آمين 🌿</button>
+  </div>
+</div>
+
 <!-- تنويه -->
 <div class="notice-overlay" id="noticeOverlay">
   <div class="notice-box">
@@ -184,6 +240,12 @@
   <h1>صيدلية نفقة الدولة</h1>
   <p>استعلم عن توفر دوائك قبل الزيارة</p>
   <p id="visitCounter" style="color:rgba(255,255,255,0.6);font-size:12px;margin-top:4px"></p>
+  <p id="lastUpdateBadge" style="color:rgba(255,255,255,0.5);font-size:11px;margin-top:2px"></p>
+</div>
+
+<!-- شريط التوريدات -->
+<div class="ticker-wrap" id="tickerWrap" style="display:none">
+  <div class="ticker" id="tickerContent"></div>
 </div>
 
 <!-- صفحة البحث -->
@@ -193,6 +255,7 @@
       <span class="search-icon">🔍</span>
       <input type="text" id="searchInput" placeholder="ابحث بالاسم التجاري أو المادة الفعالة..." autocomplete="off">
       <button class="clear-btn" id="clearBtn" onclick="clearSearch()">✕</button>
+      <button class="mic-btn" id="micBtn" onclick="startVoiceSearch()" title="بحث صوتي">🎤</button>
     </div>
   </div>
   <div class="filters">
@@ -293,21 +356,25 @@
       <div class="detail-section-title">🏷️ الأسماء التجارية المتاحة</div>
       <div id="d-tradeNames"></div>
     </div>
-    <div class="detail-section">
+    <div class="detail-section" id="d-tips-section">
       <div class="detail-section-title">📝 نصائح الاستخدام</div>
-      <div class="coming-soon"><span>📝</span>قريباً</div>
+      <div id="d-tips"></div>
     </div>
-    <div class="detail-section">
+    <div class="detail-section" id="d-warnings-section">
       <div class="detail-section-title">⚠️ تحذيرات</div>
-      <div class="coming-soon"><span>⚠️</span>قريباً</div>
+      <div id="d-warnings"></div>
     </div>
-    <div class="detail-section">
+    <div class="detail-section" id="d-alts-therapeutic-section">
+      <div class="detail-section-title">🔄 بدائل المجموعة العلاجية</div>
+      <div id="d-alts-therapeutic"></div>
+    </div>
+    <div class="detail-section" id="d-alts-general-section">
+      <div class="detail-section-title">🔄 بدائل عامة</div>
+      <div id="d-alts-general"></div>
+    </div>
+    <div class="detail-section" id="d-video-section">
       <div class="detail-section-title">🎥 فيديو شرح</div>
-      <div class="coming-soon"><span>🎥</span>قريباً</div>
-    </div>
-    <div class="detail-section">
-      <div class="detail-section-title">🔄 البدائل</div>
-      <div class="coming-soon"><span>🔄</span>قريباً</div>
+      <div id="d-video"></div>
     </div>
   </div>
 </div>
@@ -323,17 +390,31 @@
   let searchQuery = '';
   let searchTimer = null;
   let pinnedDrugs = JSON.parse(localStorage.getItem('pinnedDrugs') || '[]');
+  let currentDetailIndex = -1;
+
+  // ===== رسالة الدعاء =====
+  function closePrayer() {
+    document.getElementById('prayerOverlay').classList.remove('show');
+    sessionStorage.setItem('prayerSeen', '1');
+  }
 
   // ===== تنويه =====
   window.addEventListener('load', () => {
     if (!sessionStorage.getItem('noticeSeen')) {
       document.getElementById('noticeOverlay').classList.add('show');
+    } else if (!sessionStorage.getItem('prayerSeen')) {
+      setTimeout(() => document.getElementById('prayerOverlay').classList.add('show'), 3000);
     }
+    logVisit();
+    loadVisitCount();
   });
 
   function closeNotice() {
     document.getElementById('noticeOverlay').classList.remove('show');
     sessionStorage.setItem('noticeSeen', '1');
+    if (!sessionStorage.getItem('prayerSeen')) {
+      setTimeout(() => document.getElementById('prayerOverlay').classList.add('show'), 1000);
+    }
   }
 
   // ===== Toast =====
@@ -351,6 +432,27 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'stats', drugName, concentration, type })
     }).catch(() => {});
+  }
+
+  function logVisit() {
+    fetch(SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'visit' })
+    }).catch(() => {});
+  }
+
+  async function loadVisitCount() {
+    try {
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent('إحصائيات الزيارات')}&range=A2`;
+      const res = await fetch(url);
+      const text = await res.text();
+      const json = JSON.parse(text.substring(47).slice(0, -2));
+      const count = json?.table?.rows[0]?.c[0]?.v || 0;
+      if (count > 0) {
+        document.getElementById('visitCounter').textContent = `👥 ${Math.round(count).toLocaleString('ar-EG')} زيارة`;
+      }
+    } catch(e) {}
   }
 
   // ===== تحويل حالة التوفر =====
@@ -379,17 +481,28 @@
         tradeNames: getCellValue(row, 3),
         availability: getCellValue(row, 4),
         lastUpdate: getCellValue(row, 5),
+        altsTherapeutic: getCellValue(row, 6),
+        altsGeneral: getCellValue(row, 7),
+        tips: getCellValue(row, 8),
+        warnings: getCellValue(row, 9),
+        video: getCellValue(row, 10),
       })).filter(d => d.activeName);
 
-      // ترتيب حسب آخر تحديث (الأحدث أولاً)
       allDrugs.sort((a, b) => {
         if (!a.lastUpdate) return 1;
         if (!b.lastUpdate) return -1;
         return parseDate(b.lastUpdate) - parseDate(a.lastUpdate);
       });
 
+      // آخر تحديث في الهيدر
+      const latestUpdate = allDrugs.find(d => d.lastUpdate);
+      if (latestUpdate) {
+        document.getElementById('lastUpdateBadge').textContent = `🕐 آخر تحديث للبيانات: ${timeAgo(latestUpdate.lastUpdate)}`;
+      }
+
       updateStats();
       renderCards();
+      buildTicker();
     } catch (e) {
       document.getElementById('cardsContainer').innerHTML = `
         <div class="error-state">
@@ -408,22 +521,39 @@
   function parseDate(dateStr) {
     if (!dateStr) return 0;
     const s = dateStr.toString().trim();
-    // صيغة Google Sheets: Date(2026,2,22,5,28,0)
     const m = s.match(/Date\((\d+),(\d+),(\d+),(\d+),(\d+),(\d+)\)/);
     if (m) return new Date(+m[1], +m[2], +m[3], +m[4], +m[5], +m[6]).getTime();
-    // صيغة بدون وقت: Date(2026,2,22)
     const m2 = s.match(/Date\((\d+),(\d+),(\d+)\)/);
     if (m2) return new Date(+m2[1], +m2[2], +m2[3]).getTime();
-    // صيغة نصية: 2026-03-22 5:28
     const p = s.split(' ');
     if (p.length === 2) {
       const d = p[0].split('-');
       const t = p[1].split(':');
-      if (d.length === 3 && t.length === 2) {
-        return new Date(+d[0], +d[1]-1, +d[2], +t[0], +t[1]).getTime();
-      }
+      if (d.length === 3 && t.length === 2) return new Date(+d[0], +d[1]-1, +d[2], +t[0], +t[1]).getTime();
     }
     return 0;
+  }
+
+  // ===== شريط التوريدات =====
+  function buildTicker() {
+    const recent = allDrugs
+      .filter(d => {
+        const ts = parseDate(d.lastUpdate);
+        if (!ts) return false;
+        const diff = (Date.now() - ts) / (1000 * 60 * 60 * 24);
+        return diff <= 14 && normalizeStatus(d.availability).key === 'available';
+      })
+      .slice(0, 10);
+
+    if (recent.length === 0) return;
+
+    const items = recent.map(d =>
+      `<span class="ticker-item">🆕 <span>${d.activeName} ${d.concentration}</span> ✅</span>`
+    ).join('');
+
+    const ticker = document.getElementById('tickerContent');
+    ticker.innerHTML = items + items; // مضاعفة للحلقة المستمرة
+    document.getElementById('tickerWrap').style.display = 'block';
   }
 
   // ===== إحصائيات =====
@@ -466,11 +596,9 @@
       ? drug.tradeNames.split(',').map(n => n.trim()).filter(n => n)
       : [];
 
-    // الاسم المطابق للبحث
     let matchedName = '';
     if (q) matchedName = tradeList.find(n => n.toLowerCase().includes(q)) || '';
 
-    // العنوان الرئيسي
     let mainTitle = '';
     if (matchedName) {
       mainTitle = `<span class="matched">${matchedName}</span>`;
@@ -479,7 +607,6 @@
       mainTitle = shown + (tradeList.length > 3 ? ' <span style="color:var(--text-muted)">...</span>' : '');
     }
 
-    // الأسماء الصغيرة (بدون المطابق)
     const smallNames = tradeList
       .filter(n => n !== matchedName)
       .map(n => {
@@ -491,15 +618,29 @@
       ? `<div class="card-footer">🕐 آخر تحديث: ${timeAgo(drug.lastUpdate)}</div>`
       : '';
 
+    // أزرار سريعة
+    const hasTips = drug.tips && drug.tips.trim();
+    const hasWarnings = drug.warnings && drug.warnings.trim();
+    const hasAlts = (drug.altsTherapeutic && drug.altsTherapeutic.trim()) || (drug.altsGeneral && drug.altsGeneral.trim());
+    const hasVideo = drug.video && drug.video.trim();
+
+    const actionBtns = [
+      hasTips ? `<button class="card-action-btn" onclick="openDetailSection(event,${index},'tips')">📝 نصائح</button>` : '',
+      hasWarnings ? `<button class="card-action-btn" onclick="openDetailSection(event,${index},'warnings')">⚠️ تحذيرات</button>` : '',
+      hasAlts ? `<button class="card-action-btn" onclick="openDetailSection(event,${index},'alts')">🔄 بدائل</button>` : '',
+      hasVideo ? `<button class="card-action-btn" onclick="openDetailSection(event,${index},'video')">🎥 فيديو</button>` : '',
+    ].filter(Boolean).join('');
+
     return `
-      <div class="drug-card ${status.key}" onclick="openDetail(${index})">
-        <div class="card-header">
+      <div class="drug-card ${status.key}">
+        <div class="card-header" onclick="openDetail(${index})">
           <div class="card-trade-names">${mainTitle || drug.activeName}</div>
           <div class="status-badge ${status.key}">${status.label}</div>
         </div>
-        <div class="card-active-name">🧪 ${drug.activeName}${drug.concentration ? ' • ' + drug.concentration : ''}${drug.form ? ' • ' + getFormEmoji(drug.form) + ' ' + drug.form : ''}</div>
-        ${smallNames ? `<div class="trade-names"><span class="trade-names-label">الأسماء التجارية:</span>${smallNames}</div>` : ''}
+        <div class="card-active-name" onclick="openDetail(${index})">🧪 ${drug.activeName}${drug.concentration ? ' • ' + drug.concentration : ''}${drug.form ? ' • ' + getFormEmoji(drug.form) + ' ' + drug.form : ''}</div>
+        ${smallNames ? `<div class="trade-names" onclick="openDetail(${index})"><span class="trade-names-label">الأسماء التجارية:</span>${smallNames}</div>` : ''}
         ${lastUpdateHtml}
+        ${actionBtns ? `<div class="card-actions">${actionBtns}</div>` : ''}
         <button class="pin-btn ${isPinned ? 'pinned' : ''}" onclick="togglePin(event, ${index})">
           ${isPinned ? '✅ تم التثبيت' : '⭐ تثبيت الصنف'}
         </button>
@@ -511,18 +652,19 @@
     const drugs = getFilteredDrugs();
     const container = document.getElementById('cardsContainer');
     const resultsCount = document.getElementById('resultsCount');
-
     if (drugs.length === 0) {
       resultsCount.textContent = '';
-      container.innerHTML = `
-        <div class="empty-state">
-          <span class="emoji">🔍</span>
-          <h3>لا توجد نتائج</h3>
-          <p>جرب البحث بالاسم التجاري<br>أو المادة الفعالة باللغتين</p>
-        </div>`;
+      container.innerHTML = `<div class="empty-state"><span class="emoji">🔍</span><h3>لا توجد نتائج</h3><p>جرب البحث بالاسم التجاري<br>أو المادة الفعالة باللغتين</p></div>`;
+      // تسجيل البحث بدون نتائج
+      if (searchQuery.trim().length > 2) {
+        fetch(SCRIPT_URL, {
+          method: 'POST', mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'zeroresult', query: searchQuery.trim() })
+        }).catch(() => {});
+      }
       return;
     }
-
     resultsCount.textContent = `${drugs.length} نتيجة`;
     container.innerHTML = drugs.map(drug => buildCard(drug, allDrugs.indexOf(drug))).join('');
   }
@@ -551,25 +693,55 @@
     const container = document.getElementById('pinnedCards');
     const valid = pinnedDrugs.filter(i => allDrugs[i]);
     if (valid.length === 0) {
-      container.innerHTML = `
-        <div class="pinned-empty">
-          <span class="emoji">⭐</span>
-          <h3>لا توجد أصناف مثبتة</h3>
-          <p>اضغط "⭐ تثبيت الصنف" على أي دواء<br>ليظهر هنا في كل زيارة</p>
-        </div>`;
+      container.innerHTML = `<div class="pinned-empty"><span class="emoji">⭐</span><h3>لا توجد أصناف مثبتة</h3><p>اضغط "⭐ تثبيت الصنف" على أي دواء<br>ليظهر هنا في كل زيارة</p></div>`;
       return;
     }
     container.innerHTML = valid.map(i => buildCard(allDrugs[i], i)).join('');
   }
 
-  // ===== صفحة التفاصيل =====
-  let currentDetailIndex = -1;
+  // ===== البدائل =====
+  function buildAltsHtml(altsStr) {
+    if (!altsStr || !altsStr.trim()) return '<div class="coming-soon"><span>🔄</span>قريباً</div>';
+    const s = altsStr.trim().toLowerCase();
+    if (s === 'none' || s === 'لا يوجد' || s === 'لا يوجد بديل') {
+      return '<div class="no-alt">🚫 لا يوجد بديل حالياً</div>';
+    }
+    const items = altsStr.split(',').map(s => s.trim()).filter(s => s);
+    if (items.length === 0) return '<div class="coming-soon"><span>🔄</span>قريباً</div>';
 
-  function openDetail(index) {
+    return items.map(item => {
+      const parts = item.match(/^(.+?)\s+([\d.]+\s*\S+)$/);
+      let found = null;
+      if (parts) {
+        found = allDrugs.find(d =>
+          d.activeName.toLowerCase() === parts[1].trim().toLowerCase() &&
+          d.concentration.toLowerCase().includes(parts[2].trim().toLowerCase())
+        );
+      }
+      if (!found) found = allDrugs.find(d => d.activeName.toLowerCase() === item.toLowerCase());
+      if (found) {
+        const st = normalizeStatus(found.availability);
+        return `<div class="alt-item"><span class="alt-name">${item}</span><span class="alt-badge ${st.key}">${st.label}</span></div>`;
+      } else {
+        return `<div class="alt-item"><span class="alt-name">${item}</span><span class="alt-badge unlisted">🔵 غير مدرج</span></div>`;
+      }
+    }).join('');
+  }
+
+  function buildAltsSection(altsStr) {
+    const warning = `<div class="alts-warning"><strong>⚠️ تنبيه مهم:</strong>لا تقم بتغيير دوائك من نفسك — استشر طبيبك أولاً لتجنب أي آثار جانبية أو مضاعفات.</div>`;
+    const content = buildAltsHtml(altsStr);
+    return warning + content;
+  }
+
+  // ===== صفحة التفاصيل =====
+  function openDetail(index, scrollTo = null) {
     currentDetailIndex = index;
     const drug = allDrugs[index];
     if (!drug) return;
+
     logStats(drug.activeName, drug.concentration, 'click');
+
     const status = normalizeStatus(drug.availability);
     document.getElementById('detailName').textContent = drug.activeName;
     document.getElementById('detailStatus').innerHTML = `<div class="detail-status ${status.key}">${status.label}</div>`;
@@ -578,11 +750,14 @@
     document.getElementById('d-form').textContent = drug.form ? `${getFormEmoji(drug.form)} ${drug.form}` : '—';
     document.getElementById('d-update').textContent = drug.lastUpdate ? timeAgo(drug.lastUpdate) : '—';
 
-    // زر التثبيت في صفحة التفاصيل
+    // زر التثبيت
     const isPinned = pinnedDrugs.includes(index);
-    document.getElementById('d-pin-btn').textContent = isPinned ? '✅ تم التثبيت' : '⭐ تثبيت الصنف';
-    document.getElementById('d-pin-btn').className = 'pin-btn ' + (isPinned ? 'pinned' : '');
-    document.getElementById('d-pin-btn').onclick = (e) => togglePin(e, index);
+    const pinBtn = document.getElementById('d-pin-btn');
+    pinBtn.textContent = isPinned ? '✅ تم التثبيت' : '⭐ تثبيت الصنف';
+    pinBtn.className = 'pin-btn ' + (isPinned ? 'pinned' : '');
+    pinBtn.onclick = (e) => togglePin(e, index);
+
+    // الأسماء التجارية
     const tradesEl = document.getElementById('d-tradeNames');
     if (drug.tradeNames) {
       tradesEl.innerHTML = drug.tradeNames.split(',').map(n => n.trim()).filter(n => n)
@@ -590,8 +765,63 @@
     } else {
       tradesEl.innerHTML = '<div class="coming-soon"><span>🏷️</span>لا توجد أسماء مسجلة</div>';
     }
+
+    // نصائح
+    document.getElementById('d-tips').innerHTML = drug.tips && drug.tips.trim()
+      ? `<div class="tips-text">${drug.tips}</div>`
+      : '<div class="coming-soon"><span>📝</span>قريباً</div>';
+
+    // تحذيرات
+    document.getElementById('d-warnings').innerHTML = drug.warnings && drug.warnings.trim()
+      ? `<div class="warning-text">⚠️ ${drug.warnings}</div>`
+      : '<div class="coming-soon"><span>⚠️</span>قريباً</div>';
+
+    // بدائل المجموعة العلاجية
+    document.getElementById('d-alts-therapeutic').innerHTML = drug.altsTherapeutic && drug.altsTherapeutic.trim()
+      ? buildAltsSection(drug.altsTherapeutic)
+      : '<div class="coming-soon"><span>🔄</span>قريباً</div>';
+
+    // بدائل عامة
+    document.getElementById('d-alts-general').innerHTML = drug.altsGeneral && drug.altsGeneral.trim()
+      ? buildAltsSection(drug.altsGeneral)
+      : '<div class="coming-soon"><span>🔄</span>قريباً</div>';
+
+    // فيديو
+    if (drug.video && drug.video.trim()) {
+      const videoId = extractYoutubeId(drug.video);
+      document.getElementById('d-video').innerHTML = videoId
+        ? `<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe></div>`
+        : `<a href="${drug.video}" target="_blank" style="color:var(--primary)">🎥 افتح الفيديو</a>`;
+    } else {
+      document.getElementById('d-video').innerHTML = '<div class="coming-soon"><span>🎥</span>قريباً</div>';
+    }
+
     document.getElementById('detailPage').classList.add('open');
     document.body.style.overflow = 'hidden';
+
+    // التمرير للقسم المطلوب
+    if (scrollTo) {
+      setTimeout(() => {
+        const sectionMap = {
+          'tips': 'd-tips-section',
+          'warnings': 'd-warnings-section',
+          'alts': 'd-alts-therapeutic-section',
+          'video': 'd-video-section'
+        };
+        const el = document.getElementById(sectionMap[scrollTo]);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 150);
+    }
+  }
+
+  function openDetailSection(event, index, section) {
+    event.stopPropagation();
+    openDetail(index, section);
+  }
+
+  function extractYoutubeId(url) {
+    const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
+    return m ? m[1] : null;
   }
 
   function closeDetail() {
@@ -648,6 +878,59 @@
       if (btn) btn.classList.toggle('active', p === page);
     });
     if (page === 'pinned') renderPinned();
+  }
+
+  // ===== البحث الصوتي =====
+  function startVoiceSearch() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      showToast('البحث الصوتي غير مدعوم في هذا المتصفح');
+      return;
+    }
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'ar-EG';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    const micBtn = document.getElementById('micBtn');
+    micBtn.classList.add('listening');
+    micBtn.textContent = '🔴';
+
+    recognition.start();
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      const input = document.getElementById('searchInput');
+      input.value = transcript;
+      searchQuery = transcript;
+      document.getElementById('clearBtn').style.display = 'block';
+      renderCards();
+    };
+
+    recognition.onend = () => {
+      micBtn.classList.remove('listening');
+      micBtn.textContent = '🎤';
+    };
+
+    recognition.onerror = () => {
+      micBtn.classList.remove('listening');
+      micBtn.textContent = '🎤';
+      showToast('لم يتم التعرف على الصوت، حاول مجدداً');
+    };
+  }
+
+  // ===== زيارات =====
+  async function loadVisitCount() {
+    try {
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent('إحصائيات الزيارات')}&range=A2`;
+      const res = await fetch(url);
+      const text = await res.text();
+      const json = JSON.parse(text.substring(47).slice(0, -2));
+      const count = json?.table?.rows[0]?.c[0]?.v || 0;
+      if (count > 0) {
+        document.getElementById('visitCounter').textContent = `👥 ${Math.round(count).toLocaleString('ar-EG')} زيارة`;
+      }
+    } catch(e) {}
   }
 
   // ===== منذ كذا =====
@@ -710,31 +993,7 @@
     renderCards();
   }
 
-  // ===== تسجيل الزيارة =====
-  function logVisit() {
-    fetch(SCRIPT_URL, {
-      method: 'POST', mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'visit' })
-    }).catch(() => {});
-  }
-
-  async function loadVisitCount() {
-    try {
-      const VISITS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent('إحصائيات الزيارات')}&range=A2`;
-      const res = await fetch(VISITS_URL);
-      const text = await res.text();
-      const json = JSON.parse(text.substring(47).slice(0, -2));
-      const count = json?.table?.rows[0]?.c[0]?.v || 0;
-      if (count > 0) {
-        document.getElementById('visitCounter').textContent = `👥 ${Math.round(count).toLocaleString('ar-EG')} زيارة`;
-      }
-    } catch(e) {}
-  }
-
   loadData();
-  logVisit();
-  loadVisitCount();
 </script>
 </body>
 </html>
