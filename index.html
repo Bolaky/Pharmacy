@@ -34,12 +34,12 @@
   .header p { color:rgba(255,255,255,0.75); font-size:13px; font-weight:300; }
 
   /* شريط التوريدات */
-  .ticker-wrap { background:rgba(0,0,0,0.2); padding:6px 0; overflow:hidden; white-space:nowrap; }
+  .ticker-wrap { background:#075044; padding:8px 0; overflow:hidden; white-space:nowrap; border-top:1px solid rgba(255,255,255,0.15); }
   .ticker { display:inline-block; animation: ticker 30s linear infinite; }
   .ticker:hover { animation-play-state: paused; }
   @keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-  .ticker-item { display:inline-block; padding:0 24px; font-size:12px; color:rgba(255,255,255,0.9); }
-  .ticker-item span { color:#7fffcf; font-weight:700; }
+  .ticker-item { display:inline-block; padding:0 28px; font-size:14px; font-weight:600; color:#ffffff; }
+  .ticker-item span { color:#7fffcf; font-weight:800; font-size:15px; }
 
   /* تنويه */
   .notice-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center; padding:20px; }
@@ -48,6 +48,7 @@
   .notice-icon { font-size:44px; display:block; margin-bottom:12px; }
   .notice-title { font-size:18px; font-weight:800; color:var(--primary-dark); margin-bottom:12px; }
   .notice-text { font-size:14px; color:var(--text-muted); line-height:1.8; margin-bottom:20px; }
+  .notice-sub { font-size:12px; color:#aaa; margin-top:8px; }
   .notice-btn { width:100%; padding:13px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-family:'Tajawal',sans-serif; font-size:16px; font-weight:700; cursor:pointer; }
 
   /* Search */
@@ -228,6 +229,7 @@
       البيانات المعروضة <strong>استرشادية فقط</strong>.<br><br>
       توفر الأصناف يخضع لحركة صرف الصنف بالصيدلية وتوريد المخازن والشركات، وقد يتغير في أي وقت.
     </div>
+    <div class="notice-sub">📋 البيانات للاستئناس فقط</div>
     <button class="notice-btn" onclick="closeNotice()">حسناً، فهمت ✓</button>
   </div>
 </div>
@@ -618,16 +620,18 @@
       ? `<div class="card-footer">🕐 آخر تحديث: ${timeAgo(drug.lastUpdate)}</div>`
       : '';
 
-    // أزرار سريعة
+    // أزرار سريعة منفصلة
     const hasTips = drug.tips && drug.tips.trim();
     const hasWarnings = drug.warnings && drug.warnings.trim();
-    const hasAlts = (drug.altsTherapeutic && drug.altsTherapeutic.trim()) || (drug.altsGeneral && drug.altsGeneral.trim());
+    const hasAltsT = drug.altsTherapeutic && drug.altsTherapeutic.trim();
+    const hasAltsG = drug.altsGeneral && drug.altsGeneral.trim();
     const hasVideo = drug.video && drug.video.trim();
 
     const actionBtns = [
       hasTips ? `<button class="card-action-btn" onclick="openDetailSection(event,${index},'tips')">📝 نصائح</button>` : '',
       hasWarnings ? `<button class="card-action-btn" onclick="openDetailSection(event,${index},'warnings')">⚠️ تحذيرات</button>` : '',
-      hasAlts ? `<button class="card-action-btn" onclick="openDetailSection(event,${index},'alts')">🔄 بدائل</button>` : '',
+      hasAltsT ? `<button class="card-action-btn" onclick="openDetailSection(event,${index},'alts-therapeutic')">🔄 بدائل المجموعة</button>` : '',
+      hasAltsG ? `<button class="card-action-btn" onclick="openDetailSection(event,${index},'alts-general')">🔄 بدائل عامة</button>` : '',
       hasVideo ? `<button class="card-action-btn" onclick="openDetailSection(event,${index},'video')">🎥 فيديو</button>` : '',
     ].filter(Boolean).join('');
 
@@ -640,10 +644,10 @@
         <div class="card-active-name" onclick="openDetail(${index})">🧪 ${drug.activeName}${drug.concentration ? ' • ' + drug.concentration : ''}${drug.form ? ' • ' + getFormEmoji(drug.form) + ' ' + drug.form : ''}</div>
         ${smallNames ? `<div class="trade-names" onclick="openDetail(${index})"><span class="trade-names-label">الأسماء التجارية:</span>${smallNames}</div>` : ''}
         ${lastUpdateHtml}
-        ${actionBtns ? `<div class="card-actions">${actionBtns}</div>` : ''}
         <button class="pin-btn ${isPinned ? 'pinned' : ''}" onclick="togglePin(event, ${index})">
           ${isPinned ? '✅ تم التثبيت' : '⭐ تثبيت الصنف'}
         </button>
+        ${actionBtns ? `<div class="card-actions">${actionBtns}</div>` : ''}
       </div>`;
   }
 
@@ -712,16 +716,22 @@
     return items.map(item => {
       const parts = item.match(/^(.+?)\s+([\d.]+\s*\S+)$/);
       let found = null;
+      let foundIndex = -1;
       if (parts) {
-        found = allDrugs.find(d =>
+        foundIndex = allDrugs.findIndex(d =>
           d.activeName.toLowerCase() === parts[1].trim().toLowerCase() &&
           d.concentration.toLowerCase().includes(parts[2].trim().toLowerCase())
         );
       }
-      if (!found) found = allDrugs.find(d => d.activeName.toLowerCase() === item.toLowerCase());
+      if (foundIndex === -1) foundIndex = allDrugs.findIndex(d => d.activeName.toLowerCase() === item.toLowerCase());
+      found = foundIndex !== -1 ? allDrugs[foundIndex] : null;
+
       if (found) {
         const st = normalizeStatus(found.availability);
-        return `<div class="alt-item"><span class="alt-name">${item}</span><span class="alt-badge ${st.key}">${st.label}</span></div>`;
+        return `<div class="alt-item" onclick="openDetail(${foundIndex})" style="cursor:pointer">
+          <span class="alt-name">${item} <span style="font-size:10px;color:var(--primary)">← اضغط للتفاصيل</span></span>
+          <span class="alt-badge ${st.key}">${st.label}</span>
+        </div>`;
       } else {
         return `<div class="alt-item"><span class="alt-name">${item}</span><span class="alt-badge unlisted">🔵 غير مدرج</span></div>`;
       }
@@ -806,6 +816,8 @@
           'tips': 'd-tips-section',
           'warnings': 'd-warnings-section',
           'alts': 'd-alts-therapeutic-section',
+          'alts-therapeutic': 'd-alts-therapeutic-section',
+          'alts-general': 'd-alts-general-section',
           'video': 'd-video-section'
         };
         const el = document.getElementById(sectionMap[scrollTo]);
