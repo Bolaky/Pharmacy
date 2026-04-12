@@ -34,12 +34,14 @@
   .header p { color:rgba(255,255,255,0.75); font-size:13px; font-weight:300; }
 
   /* شريط التوريدات */
-  .ticker-wrap { background:#075044; padding:8px 0; overflow:hidden; white-space:nowrap; border-top:1px solid rgba(255,255,255,0.15); }
+  .ticker-wrap { background:#0a6e5c; padding:8px 0; overflow:hidden; white-space:nowrap; margin:10px 16px 0; border-radius:12px; }
   .ticker { display:inline-block; animation: ticker 30s linear infinite; }
   .ticker:hover { animation-play-state: paused; }
   @keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-  .ticker-item { display:inline-block; padding:0 28px; font-size:14px; font-weight:600; color:#ffffff; }
-  .ticker-item span { color:#7fffcf; font-weight:800; font-size:15px; }
+  .ticker-item { display:inline-block; padding:0 28px; font-size:14px; font-weight:700; color:#ffffff; }
+  .ticker-item .ticker-label { color:#7fffcf; font-size:12px; font-weight:600; margin-left:4px; }
+  .ticker-item .ticker-name { color:#ffffff; font-size:14px; font-weight:800; }
+  .ticker-item .ticker-status { color:#7fffcf; font-size:12px; margin-right:4px; }
 
   /* تنويه */
   .notice-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center; padding:20px; }
@@ -100,8 +102,9 @@
 
   /* أزرار الكارت */
   .card-actions { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
-  .card-action-btn { flex:1; min-width:70px; padding:7px 8px; border-radius:10px; border:1.5px solid var(--border); background:#fff; font-family:'Tajawal',sans-serif; font-size:11px; font-weight:600; color:var(--text-muted); cursor:pointer; transition:all 0.2s; text-align:center; }
+  .card-action-btn { flex:1; min-width:80px; padding:7px 8px; border-radius:10px; border:1.5px solid var(--border); background:#fff; font-family:'Tajawal',sans-serif; font-size:11px; font-weight:600; color:var(--text-muted); cursor:pointer; transition:all 0.2s; text-align:center; }
   .card-action-btn:hover { border-color:var(--primary); color:var(--primary); background:var(--accent); }
+  .card-action-btn.coming { background:#f8f8f8; color:#bbb; border-color:#eee; font-size:10px; }
 
   /* زر التثبيت */
   .pin-btn { width:100%; padding:9px; border-radius:12px; border:1.5px solid var(--border); background:#fff; font-family:'Tajawal',sans-serif; font-size:13px; font-weight:700; color:var(--text-muted); cursor:pointer; transition:all 0.2s; text-align:center; margin-top:10px; }
@@ -245,7 +248,7 @@
   <p id="lastUpdateBadge" style="color:rgba(255,255,255,0.5);font-size:11px;margin-top:2px"></p>
 </div>
 
-<!-- شريط التوريدات -->
+<!-- شريط التوريدات - سيُنقل تحت البحث بواسطة JS -->
 <div class="ticker-wrap" id="tickerWrap" style="display:none">
   <div class="ticker" id="tickerContent"></div>
 </div>
@@ -260,6 +263,9 @@
       <button class="mic-btn" id="micBtn" onclick="startVoiceSearch()" title="بحث صوتي">🎤</button>
     </div>
   </div>
+
+  <!-- شريط التوريدات تحت البحث مباشرة -->
+  <div id="tickerPlaceholder"></div>
   <div class="filters">
     <button class="filter-btn active" onclick="setFilter('all', this)">الكل</button>
     <button class="filter-btn" onclick="setFilter('available', this)">✅ متوفر</button>
@@ -550,12 +556,16 @@
     if (recent.length === 0) return;
 
     const items = recent.map(d =>
-      `<span class="ticker-item">🆕 <span>${d.activeName} ${d.concentration}</span> ✅</span>`
+      `<span class="ticker-item"><span class="ticker-label">✅ توفر حديثاً:</span> <span class="ticker-name">${d.activeName} ${d.concentration}</span> <span class="ticker-status">•</span></span>`
     ).join('');
 
-    const ticker = document.getElementById('tickerContent');
-    ticker.innerHTML = items + items; // مضاعفة للحلقة المستمرة
-    document.getElementById('tickerWrap').style.display = 'block';
+    const tickerWrap = document.getElementById('tickerWrap');
+    document.getElementById('tickerContent').innerHTML = items + items;
+    tickerWrap.style.display = 'block';
+
+    // انقل الشريط تحت البحث
+    const placeholder = document.getElementById('tickerPlaceholder');
+    if (placeholder) placeholder.appendChild(tickerWrap);
   }
 
   // ===== إحصائيات =====
@@ -620,20 +630,29 @@
       ? `<div class="card-footer">🕐 آخر تحديث: ${timeAgo(drug.lastUpdate)}</div>`
       : '';
 
-    // أزرار سريعة منفصلة
+    // أزرار سريعة دائماً ظاهرة
     const hasTips = drug.tips && drug.tips.trim();
     const hasWarnings = drug.warnings && drug.warnings.trim();
     const hasAltsT = drug.altsTherapeutic && drug.altsTherapeutic.trim();
     const hasAltsG = drug.altsGeneral && drug.altsGeneral.trim();
     const hasVideo = drug.video && drug.video.trim();
 
-    const actionBtns = [
-      hasTips ? `<button class="card-action-btn" onclick="openDetailSection(event,${index},'tips')">📝 نصائح</button>` : '',
-      hasWarnings ? `<button class="card-action-btn" onclick="openDetailSection(event,${index},'warnings')">⚠️ تحذيرات</button>` : '',
-      hasAltsT ? `<button class="card-action-btn" onclick="openDetailSection(event,${index},'alts-therapeutic')">🔄 بدائل المجموعة</button>` : '',
-      hasAltsG ? `<button class="card-action-btn" onclick="openDetailSection(event,${index},'alts-general')">🔄 بدائل عامة</button>` : '',
-      hasVideo ? `<button class="card-action-btn" onclick="openDetailSection(event,${index},'video')">🎥 فيديو</button>` : '',
-    ].filter(Boolean).join('');
+    const actionBtns = `
+      <button class="card-action-btn ${hasTips ? '' : 'coming'}" onclick="openDetailSection(event,${index},'tips','tips_click')">
+        📝 ${hasTips ? 'نصائح' : 'نصائح قريباً'}
+      </button>
+      <button class="card-action-btn ${hasWarnings ? '' : 'coming'}" onclick="openDetailSection(event,${index},'warnings','warnings_click')">
+        ⚠️ ${hasWarnings ? 'تحذيرات' : 'تحذيرات قريباً'}
+      </button>
+      <button class="card-action-btn ${hasAltsT ? '' : 'coming'}" onclick="openDetailSection(event,${index},'alts-therapeutic','alts_therapeutic_click')">
+        🔄 ${hasAltsT ? 'بدائل المجموعة' : 'بدائل المجموعة قريباً'}
+      </button>
+      <button class="card-action-btn ${hasAltsG ? '' : 'coming'}" onclick="openDetailSection(event,${index},'alts-general','alts_general_click')">
+        🔄 ${hasAltsG ? 'بدائل عامة' : 'بدائل عامة قريباً'}
+      </button>
+      <button class="card-action-btn ${hasVideo ? '' : 'coming'}" onclick="openDetailSection(event,${index},'video','video_click')">
+        🎥 ${hasVideo ? 'فيديو شرح' : 'فيديو قريباً'}
+      </button>`;
 
     return `
       <div class="drug-card ${status.key}">
@@ -647,7 +666,7 @@
         <button class="pin-btn ${isPinned ? 'pinned' : ''}" onclick="togglePin(event, ${index})">
           ${isPinned ? '✅ تم التثبيت' : '⭐ تثبيت الصنف'}
         </button>
-        ${actionBtns ? `<div class="card-actions">${actionBtns}</div>` : ''}
+        <div class="card-actions">${actionBtns}</div>
       </div>`;
   }
 
@@ -826,8 +845,12 @@
     }
   }
 
-  function openDetailSection(event, index, section) {
+  function openDetailSection(event, index, section, statType = null) {
     event.stopPropagation();
+    const drug = allDrugs[index];
+    if (drug && statType) {
+      logStats(drug.activeName, drug.concentration, statType);
+    }
     openDetail(index, section);
   }
 
