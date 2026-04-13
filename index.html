@@ -37,9 +37,6 @@
   header h1 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
   header p { font-size: 14px; opacity: 0.9; }
 
-  /* رسالة الدعاء والترحيب الأصلية */
-  .welcome-msg { font-size: 14px; margin-top: 10px; font-style: italic; color: #e8f5f2; }
-
   .ticker-wrap { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.2); height: 35px; overflow: hidden; white-space: nowrap; display: flex; align-items: center; }
   .ticker { display: inline-block; animation: ticker 30s linear infinite; padding-right: 100%; color: #fff; font-size: 13px; font-weight: 500; }
   @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
@@ -48,11 +45,11 @@
 
   .container { max-width: 600px; margin: -40px auto 0; padding: 0 15px; position: relative; z-index: 10; }
 
-  .search-box { background: var(--card); border-radius: var(--radius); padding: 8px; display: flex; align-items: center; box-shadow: var(--shadow); margin-bottom: 10px; }
+  .search-box { background: var(--card); border-radius: var(--radius); padding: 8px; display: flex; align-items: center; box-shadow: var(--shadow); margin-bottom: 20px; }
   .search-box input { flex: 1; border: none; padding: 12px 15px; font-size: 16px; outline: none; background: transparent; }
   .clear-btn { background: #eee; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: none; margin-left: 5px; color: #666; font-weight: bold; }
 
-  /* ميزة "هل تقصد" */
+  /* ميزة هل تقصد - تم دمجها في ستايلك */
   #didYouMean { display: none; background: #fff3cd; color: #856404; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; border: 1px solid #ffeeba; cursor: pointer; }
 
   .stats-info { background: #fff; border-radius: var(--radius); padding: 12px 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; border-right: 4px solid var(--primary); box-shadow: var(--shadow); }
@@ -89,7 +86,6 @@
   .pin-btn { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5; transition: 0.3s; }
   .pin-btn.active { background: var(--primary); color: white; transform: rotate(45deg); }
 
-  /* المودال الأصلي */
   .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 100; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
   .modal { background: white; width: 100%; max-width: 500px; border-radius: 20px; overflow: hidden; max-height: 90vh; display: flex; flex-direction: column; }
   .modal-header { padding: 20px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center; }
@@ -105,7 +101,6 @@
 <header>
   <h1>دليل أدوية نفقة الدولة</h1>
   <p>تابع توفر علاجك والبدائل المتاحة لحظة بلحظة</p>
-  <div class="welcome-msg">"اللهم رب الناس، أذهب الباس، اشف أنت الشافي، لا شفاء إلا شفاؤك"</div>
   <div class="ticker-wrap">
     <div class="ticker" id="ticker">جاري تحميل آخر التوريدات...</div>
   </div>
@@ -120,7 +115,7 @@
   <div id="didYouMean"></div>
 
   <div class="stats-info">
-    <span>إجمالي الأدوية: <b id="totalCount">...</b></span>
+    <span>إجمالي الأدوية بالدليل: <b id="totalCount">...</b></span>
     <span>آخر تحديث: <b id="lastUpdate">...</b></span>
   </div>
 
@@ -131,7 +126,7 @@
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-header">
-      <h3 id="modalTitle">التفاصيل</h3>
+      <h3 id="modalTitle">تفاصيل الدواء</h3>
       <button class="close-modal" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body" id="modalBody"></div>
@@ -139,8 +134,8 @@
 </div>
 
 <script>
-  // ⚠️ ضع رابط الـ Web App الخاص بك هنا
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwx5mDI7gZb4TN7K3NnMfCwntiJZreqob6f9rmVKVAGXpoEzyXB8qjA_ZfmOj6pGcil/exec'; 
+  // استخدم رابط الـ Web App الخاص بك هنا
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwx5mDI7gZb4TN7K3NnMfCwntiJZreqob6f9rmVKVAGXpoEzyXB8qjA_ZfmOj6pGcil/exec';
 
   let allDrugs = [];
   let pinnedDrugs = JSON.parse(localStorage.getItem('pinnedDrugs') || '[]');
@@ -166,16 +161,19 @@
 
   function updateTicker() {
     const news = allDrugs.filter(d => d.isNew).slice(0, 5);
-    document.getElementById('ticker').innerHTML = news.length > 0 ? 
-      news.map(d => `<span>توفر حديثاً: ${d.activeName}</span>`).join('') :
-      '<span>مرحباً بكم في صيدلية نفقة الدولة</span>';
+    const ticker = document.getElementById('ticker');
+    if (news.length > 0) {
+      ticker.innerHTML = news.map(d => `<span>توفر حديثاً: ${d.activeName} (${d.concentration})</span>`).join('');
+    } else {
+      ticker.innerHTML = '<span>نعمل دائماً على توفير احتياجاتكم من الدواء</span>';
+    }
   }
 
   function renderCards() {
     const list = document.getElementById('drugsList');
     const filtered = getFilteredDrugs();
     
-    // ميزة "هل تقصد"
+    // ميزة هل تقصد
     handleSmartSearch(searchQuery.toLowerCase().trim(), filtered);
 
     list.innerHTML = filtered.map((drug) => {
@@ -187,10 +185,16 @@
           <button class="pin-btn ${isPinned ? 'active' : ''}" onclick="togglePin(event, '${drug.activeName + drug.concentration}')">📌</button>
           <div class="card-content">
             <div class="card-header">
-              <div class="drug-name">${drug.activeName}</div>
+              <div>
+                <div class="drug-name">${drug.activeName}</div>
+                <div class="drug-form">${drug.pharmaceuticalForm}</div>
+              </div>
               <span class="status-badge" style="background:${getStatusColor(drug.status)}">${drug.status}</span>
             </div>
-            <div class="drug-form">${drug.pharmaceuticalForm} | ${drug.concentration}</div>
+            <div class="details-grid">
+              <div class="detail-item"><span class="detail-label">التركيز</span><span class="detail-val">${drug.concentration}</span></div>
+              <div class="detail-item"><span class="detail-label">آخر تحديث</span><span class="detail-val">${drug.lastUpdate}</span></div>
+            </div>
             <div class="action-btns">
               <button class="btn-action btn-alt" onclick="openDetailSection(event, ${realIndex}, 'alternatives', 'alts_therapeutic_click')">🔍 البدائل</button>
               <button class="btn-action btn-info" onclick="openDetailSection(event, ${realIndex}, 'tips', 'tips_click')">💡 نصائح</button>
@@ -202,13 +206,24 @@
     }).join('');
   }
 
-  // ميزة "هل تقصد" باستخدام خوارزمية Levenshtein
+  // --- دوال الإحصائيات وهل تقصد ---
+  function logStats(name, conc, type) {
+    const url = `${SCRIPT_URL}?name=${encodeURIComponent(name)}&conc=${encodeURIComponent(conc)}&type=${encodeURIComponent(type)}`;
+    fetch(url, { mode: 'no-cors' });
+  }
+
+  function openDetailSection(event, index, section, statType) {
+    event.stopPropagation();
+    const drug = allDrugs[index];
+    logStats(drug.activeName, drug.concentration, statType);
+    openDetail(index);
+  }
+
   function handleSmartSearch(query, filtered) {
     const dym = document.getElementById('didYouMean');
     dym.style.display = 'none';
     if (query.length > 2 && filtered.length === 0) {
-      let bestMatch = null;
-      let minDistance = 3;
+      let bestMatch = null; let minDistance = 3;
       allDrugs.forEach(d => {
         let dist = levenshtein(query, d.activeName.toLowerCase());
         if (dist < minDistance) { minDistance = dist; bestMatch = d.activeName; }
@@ -233,65 +248,24 @@
     return tmp[a.length][b.length];
   }
 
-  // تسجيل الإحصائيات (الإصلاح المطلوب)
-  function logStats(name, conc, type) {
-    const url = `${SCRIPT_URL}?name=${encodeURIComponent(name)}&conc=${encodeURIComponent(conc)}&type=${encodeURIComponent(type)}`;
-    fetch(url, { mode: 'no-cors' });
-  }
-
-  function openDetailSection(event, index, section, statType) {
-    event.stopPropagation();
-    const drug = allDrugs[index];
-    logStats(drug.activeName, drug.concentration, statType);
-    openDetail(index);
-  }
-
+  // --- بقية دوال كودك الأصلي ---
   function openDetail(index, type = null) {
     const drug = allDrugs[index];
     if (type) logStats(drug.activeName, drug.concentration, type);
     document.getElementById('modalTitle').innerText = drug.activeName;
-    document.getElementById('modalBody').innerHTML = `
-      <p><b>الحالة:</b> ${drug.status}</p>
-      <p><b>البدائل:</b> ${drug.alternativesTherapeutic}</p>
-      <p><b>نصائح:</b> ${drug.tips || 'قريباً'}</p>
-    `;
+    document.getElementById('modalBody').innerHTML = `<p><b>الحالة:</b> ${drug.status}</p><p><b>البدائل:</b> ${drug.alternativesTherapeutic}</p><p><b>نصائح:</b> ${drug.tips || 'قريباً'}</p>`;
     document.getElementById('modalOverlay').style.display = 'flex';
   }
-
   function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
-
   function getFilteredDrugs() {
-    const query = searchQuery.toLowerCase().trim();
-    return allDrugs.filter(d => d.activeName.toLowerCase().includes(query) || d.alternativesTherapeutic.toLowerCase().includes(query));
+    const q = searchQuery.toLowerCase().trim();
+    return allDrugs.filter(d => d.activeName.toLowerCase().includes(q) || d.alternativesTherapeutic.toLowerCase().includes(q));
   }
-
   function getStatusClass(s) { return s.includes('متوفر') ? 'available' : 'unavailable'; }
   function getStatusColor(s) { return s.includes('متوفر') ? '#0a6e5c' : '#c0392b'; }
-
-  function togglePin(event, id) {
-    event.stopPropagation();
-    const idx = pinnedDrugs.indexOf(id);
-    if (idx > -1) pinnedDrugs.splice(idx, 1); else pinnedDrugs.push(id);
-    localStorage.setItem('pinnedDrugs', JSON.stringify(pinnedDrugs));
-    renderCards();
-  }
-
-  function clearSearch() {
-    document.getElementById('searchInput').value = '';
-    searchQuery = '';
-    document.getElementById('didYouMean').style.display = 'none';
-    renderCards();
-  }
-
-  document.getElementById('searchInput').addEventListener('input', function() {
-    searchQuery = this.value;
-    renderCards();
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(() => {
-      logStats(searchQuery || "فراغ", "بحث", "search");
-    }, 2000);
-  });
-
+  function togglePin(event, id) { event.stopPropagation(); const idx = pinnedDrugs.indexOf(id); if (idx > -1) pinnedDrugs.splice(idx, 1); else pinnedDrugs.push(id); localStorage.setItem('pinnedDrugs', JSON.stringify(pinnedDrugs)); renderCards(); }
+  function clearSearch() { document.getElementById('searchInput').value = ''; searchQuery = ''; renderCards(); }
+  document.getElementById('searchInput').addEventListener('input', function() { searchQuery = this.value; renderCards(); clearTimeout(searchTimer); searchTimer = setTimeout(() => { logStats(searchQuery || "فراغ", "بحث", "search"); }, 2000); });
   window.onload = fetchDrugs;
 </script>
 </body>
