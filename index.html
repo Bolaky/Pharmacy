@@ -108,7 +108,15 @@
   .trade-name-tag { display:inline-block; background:#f0f0f0; padding:2px 8px; border-radius:6px; margin:2px; font-size:11px; color:#444; }
   .trade-name-tag.highlight { background:#fff3cd; color:#856404; }
 
-  /* أزرار الكارت */
+  /* البحث الذكي */
+  .smart-suggestion { background:#fff; margin:8px 16px 0; border-radius:12px; padding:12px 16px; box-shadow:var(--shadow); border:1.5px solid #f9a825; display:none; }
+  .smart-suggestion-title { font-size:12px; color:#856404; margin-bottom:8px; font-weight:600; }
+  .smart-suggestion-item { display:flex; align-items:center; justify-content:space-between; padding:8px 10px; background:#fff8e1; border-radius:10px; margin-bottom:6px; cursor:pointer; transition:all 0.2s; }
+  .smart-suggestion-item:last-child { margin-bottom:0; }
+  .smart-suggestion-item:hover { background:#fff3cd; }
+  .smart-suggestion-name { font-size:14px; font-weight:700; color:var(--text); }
+  .smart-suggestion-sub { font-size:11px; color:var(--muted); }
+  .smart-suggestion-badge { font-size:11px; font-weight:700; padding:3px 8px; border-radius:8px; }
   .card-actions { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
   .card-action-btn { flex:1; min-width:80px; padding:7px 8px; border-radius:10px; border:1.5px solid var(--border); background:#fff; font-family:'Tajawal',sans-serif; font-size:11px; font-weight:600; color:var(--text-muted); cursor:pointer; transition:all 0.2s; text-align:center; }
   .card-action-btn:hover { border-color:var(--primary); color:var(--primary); background:var(--accent); }
@@ -274,6 +282,12 @@
 
   <!-- شريط التوريدات تحت البحث مباشرة -->
   <div id="tickerPlaceholder"></div>
+
+  <!-- اقتراح ذكي -->
+  <div class="smart-suggestion" id="smartSuggestion">
+    <div class="smart-suggestion-title">💡 هل تقصد؟</div>
+    <div id="smartSuggestionItems"></div>
+  </div>
   <div class="filters">
     <button class="filter-btn active" onclick="setFilter('all', this)">الكل</button>
     <button class="filter-btn" onclick="setFilter('available', this)">✅ متوفر</button>
@@ -399,7 +413,7 @@
   const SHEET_ID = '1j-iFjm2bZYdLAc_-VSQatuVyZCnp1z0gIoYGO52H_BA';
   const SHEET_NAME = 'Drug status 1st version';
   const API_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyY-NwiUDcj6quXHcY3i_RANnTUWyq2ImXVX9OOQb49R20os9PVcnqTmjxDVptmw91H/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbykjQpMVWHpp8B3hwjAoc7uSMUR8xaqLanQ1f27dFi6ZGIBxDytITaFC8ghsdqigcWb/exec';
 
   let allDrugs = [];
   let currentFilter = 'all';
@@ -686,14 +700,6 @@
     if (drugs.length === 0) {
       resultsCount.textContent = '';
       container.innerHTML = `<div class="empty-state"><span class="emoji">🔍</span><h3>لا توجد نتائج</h3><p>جرب البحث بالاسم التجاري<br>أو المادة الفعالة باللغتين</p></div>`;
-      // تسجيل البحث بدون نتائج
-      if (searchQuery.trim().length > 2) {
-        fetch(SCRIPT_URL, {
-          method: 'POST', mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'zeroresult', query: searchQuery.trim() })
-        }).catch(() => {});
-      }
       return;
     }
     resultsCount.textContent = `${drugs.length} نتيجة`;
@@ -1010,16 +1016,110 @@
     return '📦';
   }
 
-  // ===== أحداث البحث =====
+  // ===== البحث الذكي =====
+  function levenshtein(a, b) {
+    const m = a.length, n = b.length;
+    const dp = Array.from({length: m+1}, (_, i) => Array.from({length: n+1}, (_, j) => i ? j ? 0 : i : j));
+    for (let i = 1; i <= m; i++)
+      for (let j = 1; j <= n; j++)
+        dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1] : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+    return dp[m][n];
+  }
+
+  function getSmartSuggestions(query) {
+    if (!query || query.length < 3) return [];
+    const q = query.toLowerCase();
+    const results = [];
+
+    allDrugs.forEach((drug, index) => {
+      // جمع كل الأسماء القابلة للمقارنة
+      const names = [drug.activeName, ...drug.tradeNames.split(',').map(n => n.trim())].filter(Boolean);
+      let bestScore = Infinity;
+
+      names.forEach(name => {
+        const n = name.toLowerCase();
+        // تطابق جزئي
+        if (n.includes(q)) { bestScore = 0; return; }
+        // مسافة ليفنشتاين على كل كلمة
+        n.split(/[\s,]+/).forEach(word => {
+          if (word.length >= 3) {
+            const dist = levenshtein(q, word);
+            const threshold = q.length <= 4 ? 1 : q.length <= 7 ? 2 : 3;
+            if (dist <= threshold) bestScore = Math.min(bestScore, dist);
+          }
+        });
+      });
+
+      if (bestScore < Infinity && bestScore > 0) {
+        results.push({ drug, index, score: bestScore });
+      }
+    });
+
+    return results.sort((a,b) => a.score - b.score).slice(0, 3);
+  }
+
+  function showSmartSuggestions(query) {
+    const box = document.getElementById('smartSuggestion');
+    const items = document.getElementById('smartSuggestionItems');
+
+    const suggestions = getSmartSuggestions(query);
+    if (!suggestions.length) { box.style.display = 'none'; return; }
+
+    const status_colors = { available: '#e8f5f0', unavailable: '#fdecea', limited: '#fef9e7', unlisted: '#e8f4fd' };
+    const status_text_colors = { available: '#0a6e5c', unavailable: '#c0392b', limited: '#d68910', unlisted: '#2980b9' };
+
+    items.innerHTML = suggestions.map(({drug, index}) => {
+      const status = normalizeStatus(drug.availability);
+      const mainName = drug.tradeNames.split(',')[0]?.trim() || drug.activeName;
+      return `
+        <div class="smart-suggestion-item" onclick="acceptSuggestion(${index})">
+          <div>
+            <div class="smart-suggestion-name">${mainName}</div>
+            <div class="smart-suggestion-sub">🧪 ${drug.activeName} • ${drug.concentration}</div>
+          </div>
+          <span class="smart-suggestion-badge" style="background:${status_colors[status.key]};color:${status_text_colors[status.key]}">${status.label}</span>
+        </div>`;
+    }).join('');
+
+    box.style.display = 'block';
+  }
+
+  function acceptSuggestion(index) {
+    const drug = allDrugs[index];
+    if (!drug) return;
+    // سجّل كبحث للصنف
+    logStats(drug.activeName, drug.concentration, 'search');
+    // أغلق الاقتراح
+    document.getElementById('smartSuggestion').style.display = 'none';
+    // افتح الكارت
+    openDetail(index);
+  }
   document.getElementById('searchInput').addEventListener('input', function() {
     searchQuery = this.value;
     document.getElementById('clearBtn').style.display = searchQuery ? 'block' : 'none';
     renderCards();
+
+    if (!searchQuery.trim()) {
+      document.getElementById('smartSuggestion').style.display = 'none';
+    }
+
     clearTimeout(searchTimer);
     if (searchQuery.trim().length > 2) {
       searchTimer = setTimeout(() => {
-        getFilteredDrugs().forEach(d => logStats(d.activeName, d.concentration, 'search'));
-      }, 1500);
+        const results = getFilteredDrugs();
+        if (results.length === 0) {
+          // بحث بدون نتائج — سجّل في الشيت وأظهر اقتراح ذكي
+          fetch(SCRIPT_URL, {
+            method: 'POST', mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'zeroresult', query: searchQuery.trim() })
+          }).catch(() => {});
+          showSmartSuggestions(searchQuery.trim());
+        } else {
+          document.getElementById('smartSuggestion').style.display = 'none';
+          results.forEach(d => logStats(d.activeName, d.concentration, 'search'));
+        }
+      }, 1200);
     }
   });
 
@@ -1027,6 +1127,7 @@
     document.getElementById('searchInput').value = '';
     searchQuery = '';
     document.getElementById('clearBtn').style.display = 'none';
+    document.getElementById('smartSuggestion').style.display = 'none';
     renderCards();
   }
 
