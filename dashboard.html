@@ -3,336 +3,384 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة تحليلات صيدلية نفقة الدولة</title>
+<title>لوحة تحليلات - صيدلية نفقة الدولة</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
   :root {
-    --primary: #0a6e5c; --primary-dark: #075044; --primary-light: #0d8f77;
-    --bg: #f4f7f6; --card: #fff; --text: #1a2e2a; --muted: #6b8680;
-    --border: #d4e6e1; --shadow: 0 2px 12px rgba(10,110,92,0.08);
+    --primary:#0a6e5c; --primary-dark:#075044; --primary-light:#0d8f77;
+    --bg:#f4f7f6; --card:#fff; --text:#1a2e2a; --muted:#6b8680;
+    --border:#d4e6e1; --shadow:0 2px 12px rgba(10,110,92,0.08);
   }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Tajawal',sans-serif; background:var(--bg); color:var(--text); }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);}
 
-  .header { background:linear-gradient(135deg,var(--primary-dark),var(--primary-light)); padding:20px 24px; display:flex; align-items:center; justify-content:space-between; }
-  .header h1 { color:#fff; font-size:20px; font-weight:800; }
-  .header p { color:rgba(255,255,255,0.7); font-size:13px; }
-  .refresh-btn { background:rgba(255,255,255,0.2); color:#fff; border:none; padding:8px 16px; border-radius:10px; font-family:'Tajawal',sans-serif; font-size:13px; cursor:pointer; }
+  /* Login */
+  .login-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,var(--primary-dark),var(--primary-light));display:flex;align-items:center;justify-content:center;z-index:999;}
+  .login-box{background:#fff;border-radius:20px;padding:32px 24px;max-width:340px;width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.2);}
+  .login-icon{font-size:48px;display:block;margin-bottom:12px;}
+  .login-title{font-size:20px;font-weight:800;color:var(--primary-dark);margin-bottom:6px;}
+  .login-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
+  .login-input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:15px;outline:none;margin-bottom:12px;text-align:center;letter-spacing:3px;}
+  .login-input:focus{border-color:var(--primary);}
+  .login-btn{width:100%;padding:13px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:700;cursor:pointer;}
+  .login-error{color:#c0392b;font-size:13px;margin-top:8px;display:none;}
 
-  .body { padding:16px; }
+  /* Dashboard */
+  .dashboard{display:none;}
+  .header{background:linear-gradient(135deg,var(--primary-dark),var(--primary-light));padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+  .header h1{color:#fff;font-size:18px;font-weight:800;}
+  .header-btns{display:flex;gap:8px;}
+  .header-btn{background:rgba(255,255,255,0.2);color:#fff;border:none;padding:7px 14px;border-radius:10px;font-family:'Tajawal',sans-serif;font-size:12px;cursor:pointer;}
 
-  /* KPI cards */
-  .kpi-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:16px; }
-  .kpi-card { background:var(--card); border-radius:14px; padding:16px; box-shadow:var(--shadow); text-align:center; border-top:3px solid var(--primary); }
-  .kpi-num { font-size:28px; font-weight:800; color:var(--primary); }
-  .kpi-label { font-size:12px; color:var(--muted); margin-top:4px; }
+  .body{padding:14px;}
 
-  /* Section */
-  .section { background:var(--card); border-radius:14px; padding:16px; box-shadow:var(--shadow); margin-bottom:16px; }
-  .section-title { font-size:15px; font-weight:700; color:var(--primary-dark); margin-bottom:14px; display:flex; align-items:center; gap:6px; border-bottom:1px solid var(--border); padding-bottom:8px; }
+  .kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;}
+  .kpi-card{background:var(--card);border-radius:14px;padding:14px;box-shadow:var(--shadow);text-align:center;border-top:3px solid var(--primary);}
+  .kpi-num{font-size:26px;font-weight:800;color:var(--primary);}
+  .kpi-label{font-size:11px;color:var(--muted);margin-top:3px;}
 
-  /* Table */
-  .data-table { width:100%; border-collapse:collapse; font-size:13px; }
-  .data-table th { background:var(--bg); padding:8px 10px; text-align:right; font-weight:700; color:var(--muted); font-size:12px; }
-  .data-table td { padding:8px 10px; border-bottom:1px solid #f5f5f5; }
-  .data-table tr:last-child td { border-bottom:none; }
-  .rank { font-weight:800; color:var(--primary); }
-  .badge { padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700; }
-  .badge-green { background:#e8f5f0; color:var(--primary); }
-  .badge-red { background:#fdecea; color:#c0392b; }
+  .section{background:var(--card);border-radius:14px;padding:14px;box-shadow:var(--shadow);margin-bottom:14px;}
+  .section-title{font-size:14px;font-weight:700;color:var(--primary-dark);margin-bottom:12px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);padding-bottom:8px;}
 
-  /* Bar */
-  .bar-wrap { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
-  .bar-label { font-size:12px; min-width:80px; text-align:right; color:var(--text); }
-  .bar-track { flex:1; background:#f0f0f0; border-radius:6px; height:18px; overflow:hidden; }
-  .bar-fill { height:100%; background:var(--primary); border-radius:6px; transition:width 0.5s; }
-  .bar-val { font-size:12px; font-weight:700; color:var(--primary); min-width:30px; }
+  .bar-wrap{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+  .bar-label{font-size:11px;min-width:100px;text-align:right;color:var(--text);line-height:1.3;}
+  .bar-track{flex:1;background:#f0f0f0;border-radius:6px;height:16px;overflow:hidden;}
+  .bar-fill{height:100%;background:var(--primary);border-radius:6px;transition:width 0.5s;}
+  .bar-val{font-size:12px;font-weight:700;color:var(--primary);min-width:28px;}
 
-  .loading { text-align:center; padding:40px; color:var(--muted); }
-  .spinner { width:32px; height:32px; border:3px solid var(--border); border-top-color:var(--primary); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 12px; }
-  @keyframes spin { to{transform:rotate(360deg)} }
+  .zero-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:13px;}
+  .zero-item:last-child{border-bottom:none;}
+  .badge{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;}
+  .badge-red{background:#fdecea;color:#c0392b;}
+  .badge-green{background:#e8f5f0;color:var(--primary);}
 
-  .zero-results-item { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f5f5f5; font-size:13px; }
-  .zero-results-item:last-child { border-bottom:none; }
+  .no-data{text-align:center;color:#ccc;padding:20px;font-size:13px;}
+  .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;margin:20px auto;}
+  @keyframes spin{to{transform:rotate(360deg)}}
 
-  .period-badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:700; margin:2px; cursor:pointer; border:1.5px solid var(--border); color:var(--muted); }
-  .period-badge.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+  .chart-container{position:relative;height:200px;}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div>
-    <h1>📊 لوحة التحليلات</h1>
-    <p id="lastRefresh">جاري التحميل...</p>
+<!-- شاشة الدخول -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <span class="login-icon">🔐</span>
+    <div class="login-title">لوحة تحليلات الصيدلية</div>
+    <div class="login-sub">للاستخدام الداخلي فقط</div>
+    <input type="password" class="login-input" id="passwordInput" placeholder="كلمة المرور" onkeypress="if(event.key==='Enter')checkPassword()">
+    <button class="login-btn" onclick="checkPassword()">دخول</button>
+    <div class="login-error" id="loginError">كلمة المرور غير صحيحة</div>
   </div>
-  <button class="refresh-btn" onclick="loadAll()">🔄 تحديث</button>
 </div>
 
-<div class="body">
-
-  <!-- KPIs -->
-  <div class="kpi-grid" id="kpiGrid">
-    <div class="loading"><div class="spinner"></div></div>
+<!-- لوحة التحليلات -->
+<div class="dashboard" id="dashboard">
+  <div class="header">
+    <div>
+      <h1>📊 لوحة تحليلات الصيدلية</h1>
+      <div style="color:rgba(255,255,255,0.7);font-size:11px;margin-top:2px" id="lastRefresh">جاري التحميل...</div>
+    </div>
+    <div class="header-btns">
+      <button class="header-btn" onclick="loadAll()">🔄 تحديث</button>
+      <button class="header-btn" onclick="logout()">خروج 🚪</button>
+    </div>
   </div>
 
-  <!-- أكثر الأدوية بحثاً -->
-  <div class="section">
-    <div class="section-title">🔍 أكثر الأدوية بحثاً</div>
-    <div id="topSearch"><div class="loading"><div class="spinner"></div></div></div>
-  </div>
+  <div class="body">
 
-  <!-- أكثر الأدوية نقراً -->
-  <div class="section">
-    <div class="section-title">👆 أكثر الأدوية نقراً على الكارت</div>
-    <div id="topClicks"><div class="loading"><div class="spinner"></div></div></div>
-  </div>
+    <!-- KPIs -->
+    <div class="kpi-grid" id="kpiGrid"><div class="spinner"></div></div>
 
-  <!-- أكثر الأدوية تثبيتاً -->
-  <div class="section">
-    <div class="section-title">⭐ أكثر الأدوية تثبيتاً</div>
-    <div id="topPinned"><div class="loading"><div class="spinner"></div></div></div>
-  </div>
+    <!-- أكثر الأدوية بحثاً -->
+    <div class="section">
+      <div class="section-title">🔍 أكثر الأدوية بحثاً (أعلى 10)</div>
+      <div id="topSearch"><div class="spinner"></div></div>
+    </div>
 
-  <!-- فاعلية البدائل -->
-  <div class="section">
-    <div class="section-title">🔄 فاعلية البدائل والمحتوى</div>
-    <div id="contentStats"><div class="loading"><div class="spinner"></div></div></div>
-  </div>
+    <!-- أكثر نقراً -->
+    <div class="section">
+      <div class="section-title">👆 أكثر الأدوية نقراً على الكارت</div>
+      <div id="topClicks"><div class="spinner"></div></div>
+    </div>
 
-  <!-- بحث بدون نتائج -->
-  <div class="section">
-    <div class="section-title">🚫 أكثر عمليات البحث بدون نتائج</div>
-    <div id="zeroResults"><div class="loading"><div class="spinner"></div></div></div>
-  </div>
+    <!-- أكثر تثبيتاً -->
+    <div class="section">
+      <div class="section-title">⭐ أكثر الأدوية تثبيتاً</div>
+      <div id="topPinned"><div class="spinner"></div></div>
+    </div>
 
-  <!-- ساعات الذروة -->
-  <div class="section">
-    <div class="section-title">⏰ ساعات الذروة</div>
-    <canvas id="hoursChart" height="200"></canvas>
-  </div>
+    <!-- فاعلية المحتوى -->
+    <div class="section">
+      <div class="section-title">🔄 فاعلية الأزرار والمحتوى</div>
+      <div id="contentStats"><div class="spinner"></div></div>
+    </div>
 
-  <!-- أيام الذروة -->
-  <div class="section">
-    <div class="section-title">📅 أيام الذروة أسبوعياً</div>
-    <canvas id="daysChart" height="200"></canvas>
-  </div>
+    <!-- بحث بدون نتائج -->
+    <div class="section">
+      <div class="section-title">🚫 بحث بدون نتائج (أعلى 15)</div>
+      <div id="zeroResults"><div class="spinner"></div></div>
+    </div>
 
-  <!-- نمو الزيارات -->
-  <div class="section">
-    <div class="section-title">📈 نمو الزيارات</div>
-    <canvas id="growthChart" height="200"></canvas>
-  </div>
+    <!-- ساعات الذروة -->
+    <div class="section">
+      <div class="section-title">⏰ ساعات الذروة خلال اليوم</div>
+      <div class="chart-container"><canvas id="hoursChart"></canvas></div>
+    </div>
 
-  <!-- ذروة الشهر -->
-  <div class="section">
-    <div class="section-title">🗓️ ذروة الشهر (بداية / منتصف / نهاية)</div>
-    <div id="monthPeriods"><div class="loading"><div class="spinner"></div></div></div>
-  </div>
+    <!-- أيام الذروة -->
+    <div class="section">
+      <div class="section-title">📅 أيام الذروة أسبوعياً</div>
+      <div class="chart-container"><canvas id="daysChart"></canvas></div>
+    </div>
 
+    <!-- نمو الزيارات -->
+    <div class="section">
+      <div class="section-title">📈 نمو الزيارات (آخر 30 يوم)</div>
+      <div class="chart-container"><canvas id="growthChart"></canvas></div>
+    </div>
+
+    <!-- ذروة الشهر -->
+    <div class="section">
+      <div class="section-title">🗓️ ذروة الشهر</div>
+      <div id="monthPeriods"><div class="spinner"></div></div>
+    </div>
+
+  </div>
 </div>
 
 <script>
   const SHEET_ID = '1j-iFjm2bZYdLAc_-VSQatuVyZCnp1z0gIoYGO52H_BA';
+  const PASSWORD = '13579'; // غيّر كلمة المرور هنا
 
-  async function fetchSheet(sheetName, range = '') {
-    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}${range ? '&range=' + range : ''}`;
-    const res = await fetch(url);
-    const text = await res.text();
-    return JSON.parse(text.substring(47).slice(0, -2));
+  // ===== الدخول =====
+  function checkPassword() {
+    const val = document.getElementById('passwordInput').value;
+    if (val === PASSWORD) {
+      document.getElementById('loginOverlay').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      sessionStorage.setItem('dashAuth', '1');
+      loadAll();
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+      document.getElementById('passwordInput').value = '';
+    }
   }
 
-  function getRows(json) {
+  function logout() {
+    sessionStorage.removeItem('dashAuth');
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('dashboard').style.display = 'none';
+  }
+
+  // تحقق من الجلسة
+  if (sessionStorage.getItem('dashAuth')) {
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+  }
+
+  // ===== جلب البيانات =====
+  async function fetchSheet(sheetName) {
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+    const res = await fetch(url);
+    const text = await res.text();
+    const json = JSON.parse(text.substring(47).slice(0, -2));
     return (json.table.rows || []).map(row =>
-      (row.c || []).map(c => c ? (c.v !== null && c.v !== undefined ? c.v.toString() : '') : '')
+      (row.c || []).map(c => c ? (c.v !== null ? c.v : '') : '')
     );
   }
 
-  let hoursChart, daysChart, growthChart;
+  let charts = {};
 
   async function loadAll() {
     document.getElementById('lastRefresh').textContent = 'جاري التحميل...';
     try {
-      await Promise.all([
-        loadKPIs(),
-        loadSearchStats(),
-        loadZeroResults(),
-        loadVisitStats(),
+      const [searchRows, visitRows, zeroRows] = await Promise.all([
+        fetchSheet('إحصائيات البحث'),
+        fetchSheet('إحصائيات الزيارات'),
+        fetchSheet('بحث بدون نتائج'),
       ]);
+
+      const dataRows = searchRows.slice(1).filter(r => r[0]);
+      const vRows = visitRows.slice(1);
+
+      renderKPIs(dataRows, visitRows);
+      renderTopSearch(dataRows);
+      renderTopClicks(dataRows);
+      renderTopPinned(dataRows);
+      renderContentStats(dataRows);
+      renderZeroResults(zeroRows.slice(1).filter(r => r[0]));
+      renderHoursChart(vRows);
+      renderDaysChart(vRows);
+      renderGrowthChart(vRows);
+      renderMonthPeriods(vRows);
+
       const now = new Date();
       document.getElementById('lastRefresh').textContent =
-        `آخر تحديث: ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+        `آخر تحديث: ${now.toLocaleTimeString('ar-EG')}`;
     } catch(e) {
-      document.getElementById('lastRefresh').textContent = 'خطأ في التحميل';
+      document.getElementById('lastRefresh').textContent = 'خطأ: ' + e.message;
     }
   }
 
-  async function loadKPIs() {
-    const [visitsJson, searchJson] = await Promise.all([
-      fetchSheet('إحصائيات الزيارات', 'A2'),
-      fetchSheet('إحصائيات البحث')
-    ]);
-
-    const totalVisits = visitsJson?.table?.rows[0]?.c[0]?.v || 0;
-    const searchRows = getRows(searchJson).slice(1).filter(r => r[0]);
-    const totalSearches = searchRows.reduce((s, r) => s + (+r[2] || 0), 0);
-    const totalPinned = searchRows.reduce((s, r) => s + (+r[5] || 0), 0);
-    const availDrugs = 0; // سيُحسب لاحقاً
+  function renderKPIs(dataRows, visitRows) {
+    const totalVisits = visitRows[1]?.[0] || 0;
+    const totalSearches = dataRows.reduce((s,r) => s + (+r[2]||0), 0);
+    const totalPinned = dataRows.reduce((s,r) => s + (+r[5]||0), 0);
+    const totalClicks = dataRows.reduce((s,r) => s + (+r[4]||0), 0);
 
     document.getElementById('kpiGrid').innerHTML = `
-      <div class="kpi-card">
-        <div class="kpi-num">${Math.round(totalVisits).toLocaleString('ar-EG')}</div>
-        <div class="kpi-label">👥 إجمالي الزيارات</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-num">${totalSearches.toLocaleString('ar-EG')}</div>
-        <div class="kpi-label">🔍 إجمالي عمليات البحث</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-num">${searchRows.length}</div>
-        <div class="kpi-label">💊 أدوية في قاعدة البيانات</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-num">${totalPinned.toLocaleString('ar-EG')}</div>
-        <div class="kpi-label">⭐ إجمالي التثبيتات</div>
-      </div>`;
+      <div class="kpi-card"><div class="kpi-num">${fmt(totalVisits)}</div><div class="kpi-label">👥 إجمالي الزيارات</div></div>
+      <div class="kpi-card"><div class="kpi-num">${fmt(totalSearches)}</div><div class="kpi-label">🔍 عمليات البحث</div></div>
+      <div class="kpi-card"><div class="kpi-num">${fmt(totalClicks)}</div><div class="kpi-label">👆 نقرات على الكروت</div></div>
+      <div class="kpi-card"><div class="kpi-num">${fmt(totalPinned)}</div><div class="kpi-label">⭐ إجمالي التثبيتات</div></div>`;
   }
 
-  async function loadSearchStats() {
-    const json = await fetchSheet('إحصائيات البحث');
-    const rows = getRows(json).slice(1).filter(r => r[0]);
+  function fmt(n) { return Math.round(+n||0).toLocaleString('ar-EG'); }
 
-    // أكثر بحثاً
-    const bySearch = [...rows].sort((a,b) => (+b[2]||0) - (+a[2]||0)).slice(0,10);
-    document.getElementById('topSearch').innerHTML = buildBarChart(bySearch, 2, 'عدد البحث');
-
-    // أكثر نقراً
-    const byClick = [...rows].sort((a,b) => (+b[4]||0) - (+a[4]||0)).slice(0,10);
-    document.getElementById('topClicks').innerHTML = buildBarChart(byClick, 4, 'عدد النقرات');
-
-    // أكثر تثبيتاً
-    const byPin = [...rows].sort((a,b) => (+b[5]||0) - (+a[5]||0)).slice(0,10);
-    document.getElementById('topPinned').innerHTML = buildBarChart(byPin, 5, 'عدد التثبيت');
-
-    // فاعلية المحتوى
-    const totalAltsT = rows.reduce((s,r) => s + (+r[6]||0), 0);
-    const totalAltsG = rows.reduce((s,r) => s + (+r[7]||0), 0);
-    const totalTips = rows.reduce((s,r) => s + (+r[8]||0), 0);
-    const totalWarn = rows.reduce((s,r) => s + (+r[9]||0), 0);
-    const totalVideo = rows.reduce((s,r) => s + (+r[10]||0), 0);
-
-    document.getElementById('contentStats').innerHTML = `
-      ${buildSimpleBar('🔄 بدائل المجموعة العلاجية', totalAltsT, Math.max(totalAltsT,totalAltsG,totalTips,totalWarn,totalVideo))}
-      ${buildSimpleBar('🔄 البدائل العامة', totalAltsG, Math.max(totalAltsT,totalAltsG,totalTips,totalWarn,totalVideo))}
-      ${buildSimpleBar('📝 النصائح', totalTips, Math.max(totalAltsT,totalAltsG,totalTips,totalWarn,totalVideo))}
-      ${buildSimpleBar('⚠️ التحذيرات', totalWarn, Math.max(totalAltsT,totalAltsG,totalTips,totalWarn,totalVideo))}
-      ${buildSimpleBar('🎥 فيديو الشرح', totalVideo, Math.max(totalAltsT,totalAltsG,totalTips,totalWarn,totalVideo))}`;
-  }
-
-  function buildBarChart(rows, col, label) {
-    if (!rows.length || rows.every(r => !+r[col])) return '<p style="text-align:center;color:#ccc;padding:20px">لا توجد بيانات بعد</p>';
-    const max = Math.max(...rows.map(r => +r[col]||0));
-    return rows.filter(r => +r[col] > 0).map((r, i) => `
+  function renderBar(rows, col, container) {
+    const filtered = [...rows].sort((a,b) => (+b[col]||0)-(+a[col]||0))
+      .filter(r => +r[col] > 0).slice(0, 10);
+    if (!filtered.length) { document.getElementById(container).innerHTML = '<div class="no-data">لا توجد بيانات بعد</div>'; return; }
+    const max = +filtered[0][col] || 1;
+    document.getElementById(container).innerHTML = filtered.map((r,i) => `
       <div class="bar-wrap">
-        <div class="bar-label">${i+1}. ${r[0]} ${r[1] ? '('+r[1]+')' : ''}</div>
-        <div class="bar-track"><div class="bar-fill" style="width:${max ? ((+r[col]||0)/max*100) : 0}%"></div></div>
-        <div class="bar-val">${r[col]||0}</div>
+        <div class="bar-label">${i+1}. ${r[0]}${r[1]?' ('+r[1]+')':''}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${(+r[col]||0)/max*100}%"></div></div>
+        <div class="bar-val">${fmt(r[col])}</div>
       </div>`).join('');
   }
 
-  function buildSimpleBar(label, val, max) {
-    return `<div class="bar-wrap">
-      <div class="bar-label">${label}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${max ? (val/max*100) : 0}%"></div></div>
-      <div class="bar-val">${val}</div>
-    </div>`;
+  function renderTopSearch(rows) { renderBar(rows, 2, 'topSearch'); }
+  function renderTopClicks(rows) { renderBar(rows, 4, 'topClicks'); }
+  function renderTopPinned(rows) { renderBar(rows, 5, 'topPinned'); }
+
+  function renderContentStats(rows) {
+    const cols = [
+      {label:'🔄 بدائل المجموعة العلاجية', col:6},
+      {label:'🔄 البدائل العامة', col:7},
+      {label:'📝 النصائح', col:8},
+      {label:'⚠️ التحذيرات', col:9},
+      {label:'🎥 فيديو الشرح', col:10},
+    ];
+    const totals = cols.map(c => ({...c, val: rows.reduce((s,r) => s+(+r[c.col]||0), 0)}));
+    const max = Math.max(...totals.map(t => t.val), 1);
+    document.getElementById('contentStats').innerHTML = totals.map(t => `
+      <div class="bar-wrap">
+        <div class="bar-label">${t.label}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${t.val/max*100}%"></div></div>
+        <div class="bar-val">${fmt(t.val)}</div>
+      </div>`).join('');
   }
 
-  async function loadZeroResults() {
-    const json = await fetchSheet('بحث بدون نتائج');
-    const rows = getRows(json).slice(1).filter(r => r[0]);
-    const sorted = [...rows].sort((a,b) => (+b[1]||0) - (+a[1]||0)).slice(0,15);
+  function renderZeroResults(rows) {
+    const sorted = [...rows].sort((a,b) => (+b[1]||0)-(+a[1]||0)).slice(0,15);
+    if (!sorted.length) { document.getElementById('zeroResults').innerHTML = '<div class="no-data">لا توجد بيانات بعد</div>'; return; }
+    document.getElementById('zeroResults').innerHTML = sorted.map((r,i) => `
+      <div class="zero-item">
+        <span>${i+1}. <strong>${r[0]}</strong></span>
+        <span class="badge badge-red">${fmt(r[1])} مرة</span>
+      </div>`).join('');
+  }
+
+  function renderHoursChart(rows) {
+    // بناء مصفوفة 24 ساعة
+    const hourMap = {};
+    rows.forEach(r => {
+      if (r[4]) { // عمود E = الساعة
+        const h = r[4].toString().replace(':00','').trim();
+        const num = parseInt(h);
+        if (!isNaN(num)) hourMap[num] = (hourMap[num]||0) + (+r[5]||1);
+      }
+    });
+    const labels = Array.from({length:24}, (_,i) => i+':00');
+    const data = Array.from({length:24}, (_,i) => hourMap[i]||0);
+
+    if (charts.hours) charts.hours.destroy();
+    charts.hours = new Chart(document.getElementById('hoursChart'), {
+      type:'bar',
+      data:{ labels, datasets:[{label:'زيارات', data, backgroundColor:'#0a6e5c', borderRadius:3}]},
+      options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, ticks:{stepSize:1}}}, maintainAspectRatio:false}
+    });
+  }
+
+  function renderDaysChart(rows) {
+    const dayMap = {};
+    rows.forEach(r => {
+      if (r[2]) { // عمود C = اليوم
+        const d = r[2].toString().trim();
+        dayMap[d] = (dayMap[d]||0) + (+r[3]||1);
+      }
+    });
+    const dayOrder = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+    const data = dayOrder.map(d => dayMap[d]||0);
+
+    if (charts.days) charts.days.destroy();
+    charts.days = new Chart(document.getElementById('daysChart'), {
+      type:'bar',
+      data:{labels:dayOrder, datasets:[{label:'زيارات', data, backgroundColor:'#0d8f77', borderRadius:3}]},
+      options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, ticks:{stepSize:1}}}, maintainAspectRatio:false}
+    });
+  }
+
+  function renderGrowthChart(rows) {
+    // جمع الزيارات اليومية
+    const dailyMap = {};
+    rows.forEach(r => {
+      if (r[1]) { // عمود B = التاريخ
+        const d = r[1].toString().trim();
+        if (d.match(/\d{4}-\d{2}-\d{2}/)) {
+          dailyMap[d] = (dailyMap[d]||0) + (+r[3]||1);
+        }
+      }
+    });
+    const sorted = Object.entries(dailyMap).sort((a,b) => a[0].localeCompare(b[0])).slice(-30);
 
     if (!sorted.length) {
-      document.getElementById('zeroResults').innerHTML = '<p style="text-align:center;color:#ccc;padding:20px">لا توجد بيانات بعد</p>';
+      document.getElementById('growthChart').parentElement.innerHTML = '<div class="no-data">لا توجد بيانات كافية بعد</div>';
       return;
     }
 
-    document.getElementById('zeroResults').innerHTML = sorted.map((r,i) => `
-      <div class="zero-results-item">
-        <span>${i+1}. <strong>${r[0]}</strong></span>
-        <span class="badge badge-red">${r[1]} مرة</span>
+    if (charts.growth) charts.growth.destroy();
+    charts.growth = new Chart(document.getElementById('growthChart'), {
+      type:'line',
+      data:{
+        labels: sorted.map(([d]) => d.slice(5)),
+        datasets:[{label:'زيارات يومية', data:sorted.map(([,v]) => v),
+          borderColor:'#0a6e5c', backgroundColor:'rgba(10,110,92,0.1)', fill:true, tension:0.4, pointRadius:3}]
+      },
+      options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}, maintainAspectRatio:false}
+    });
+  }
+
+  function renderMonthPeriods(rows) {
+    const periods = {'بداية الشهر (1-10)':0, 'منتصف الشهر (11-20)':0, 'نهاية الشهر (21-31)':0};
+    rows.forEach(r => {
+      if (r[1]) {
+        const d = r[1].toString().trim();
+        const m = d.match(/\d{4}-\d{2}-(\d{2})/);
+        if (m) {
+          const day = parseInt(m[1]);
+          const count = +r[3]||1;
+          if (day <= 10) periods['بداية الشهر (1-10)'] += count;
+          else if (day <= 20) periods['منتصف الشهر (11-20)'] += count;
+          else periods['نهاية الشهر (21-31)'] += count;
+        }
+      }
+    });
+    const max = Math.max(...Object.values(periods), 1);
+    document.getElementById('monthPeriods').innerHTML = Object.entries(periods).map(([k,v]) => `
+      <div class="bar-wrap">
+        <div class="bar-label">${k}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${v/max*100}%"></div></div>
+        <div class="bar-val">${fmt(v)}</div>
       </div>`).join('');
   }
 
-  async function loadVisitStats() {
-    const json = await fetchSheet('إحصائيات الزيارات');
-    const rows = getRows(json).slice(1).filter(r => r[0] || r[1] || r[4]);
-
-    // ساعات الذروة
-    const hourRows = rows.filter(r => r[4]).reduce((acc, r) => {
-      const h = r[4]; acc[h] = (acc[h]||0) + (+r[5]||0); return acc;
-    }, {});
-    const hours = Array.from({length:24}, (_,i) => i+':00');
-    const hourData = hours.map(h => hourRows[h] || 0);
-
-    if (hoursChart) hoursChart.destroy();
-    hoursChart = new Chart(document.getElementById('hoursChart'), {
-      type: 'bar',
-      data: {
-        labels: hours,
-        datasets: [{ label: 'عدد الزيارات', data: hourData, backgroundColor: '#0a6e5c', borderRadius: 4 }]
-      },
-      options: { plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
-    });
-
-    // أيام الذروة
-    const dayRows = rows.filter(r => r[2]).reduce((acc, r) => {
-      const d = r[2]; acc[d] = (acc[d]||0) + (+r[3]||0); return acc;
-    }, {});
-    const dayOrder = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
-    const dayData = dayOrder.map(d => dayRows[d] || 0);
-
-    if (daysChart) daysChart.destroy();
-    daysChart = new Chart(document.getElementById('daysChart'), {
-      type: 'bar',
-      data: {
-        labels: dayOrder,
-        datasets: [{ label: 'عدد الزيارات', data: dayData, backgroundColor: '#0d8f77', borderRadius: 4 }]
-      },
-      options: { plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
-    });
-
-    // نمو الزيارات (آخر 30 يوم)
-    const dailyRows = rows.filter(r => r[1]).map(r => ({date: r[1], count: +r[3]||0}))
-      .sort((a,b) => a.date.localeCompare(b.date)).slice(-30);
-
-    if (growthChart) growthChart.destroy();
-    growthChart = new Chart(document.getElementById('growthChart'), {
-      type: 'line',
-      data: {
-        labels: dailyRows.map(r => r.date.slice(5)),
-        datasets: [{ label: 'زيارات يومية', data: dailyRows.map(r => r.count), borderColor: '#0a6e5c', backgroundColor: 'rgba(10,110,92,0.1)', fill: true, tension: 0.4 }]
-      },
-      options: { plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
-    });
-
-    // ذروة الشهر
-    const periodData = { 'بداية الشهر (1-10)': 0, 'منتصف الشهر (11-20)': 0, 'نهاية الشهر (21-31)': 0 };
-    dailyRows.forEach(r => {
-      const day = parseInt(r.date.slice(8));
-      if (day <= 10) periodData['بداية الشهر (1-10)'] += r.count;
-      else if (day <= 20) periodData['منتصف الشهر (11-20)'] += r.count;
-      else periodData['نهاية الشهر (21-31)'] += r.count;
-    });
-    const maxPeriod = Math.max(...Object.values(periodData));
-    document.getElementById('monthPeriods').innerHTML = Object.entries(periodData).map(([k,v]) =>
-      buildSimpleBar(k, v, maxPeriod)
-    ).join('');
-  }
-
-  loadAll();
+  // تشغيل عند الدخول
+  if (sessionStorage.getItem('dashAuth')) loadAll();
 </script>
 </body>
 </html>
