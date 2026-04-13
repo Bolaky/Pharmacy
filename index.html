@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>صيدلية نفقة الدولة - توفر الأدوية</title>
-<!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-B92LN3C7HG"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -26,1018 +25,274 @@
     --bg: #f4f7f6;
     --card: #ffffff;
     --text: #1a2e2a;
-    --text-muted: #6b8680;
-    --border: #d4e6e1;
-    --shadow: 0 2px 16px rgba(10,110,92,0.08);
+    --text-muted: #7f8c8d;
+    --shadow: 0 4px 15px rgba(0,0,0,0.08);
+    --radius: 12px;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Tajawal', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-  /* Header */
-  .header { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--primary-light) 100%); padding: 24px 20px 40px; text-align: center; position: relative; overflow: hidden; }
-  .header::before { content:''; position:absolute; top:-40px; left:-40px; width:200px; height:200px; border-radius:50%; background:rgba(255,255,255,0.04); }
-  .header::after { content:''; position:absolute; bottom:-60px; right:-30px; width:250px; height:250px; border-radius:50%; background:rgba(255,255,255,0.04); }
-  .header-icon { font-size:40px; margin-bottom:6px; display:block; }
-  .header h1 { color:#fff; font-size:22px; font-weight:800; margin-bottom:4px; }
-  .header p { color:rgba(255,255,255,0.75); font-size:13px; font-weight:300; }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
+  body { background-color: var(--bg); color: var(--text); line-height: 1.6; padding-bottom: 40px; }
 
-  /* شريط التوريدات */
-  .ticker-wrap { background:#0a6e5c; padding:8px 0; overflow:hidden; white-space:nowrap; margin:10px 16px 0; border-radius:12px; }
-  .ticker { display:inline-block; animation: ticker 30s linear infinite; }
-  .ticker:hover { animation-play-state: paused; }
-  @keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-  .ticker-item { display:inline-block; padding:0 28px; font-size:14px; font-weight:700; color:#ffffff; }
-  .ticker-item .ticker-label { color:#7fffcf; font-size:12px; font-weight:600; margin-left:4px; }
-  .ticker-item .ticker-name { color:#ffffff; font-size:14px; font-weight:800; }
-  .ticker-item .ticker-status { color:#7fffcf; font-size:12px; margin-right:4px; }
+  header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 25px 20px 60px; text-align: center; position: relative; }
+  header h1 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+  header p { font-size: 14px; opacity: 0.9; }
 
-  /* تنويه */
-  .notice-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center; padding:20px; }
-  .notice-overlay.show { display:flex; }
-  .notice-box { background:#fff; border-radius:20px; padding:28px 20px; max-width:380px; width:100%; text-align:center; box-shadow:0 8px 32px rgba(0,0,0,0.2); }
-  .notice-icon { font-size:44px; display:block; margin-bottom:12px; }
-  .notice-title { font-size:18px; font-weight:800; color:var(--primary-dark); margin-bottom:12px; }
-  .notice-text { font-size:14px; color:var(--text-muted); line-height:1.8; margin-bottom:20px; }
-  .notice-sub { font-size:12px; color:#aaa; margin-top:8px; }
-  .notice-btn { width:100%; padding:13px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-family:'Tajawal',sans-serif; font-size:16px; font-weight:700; cursor:pointer; }
+  /* رسالة الدعاء والترحيب الأصلية */
+  .welcome-msg { font-size: 14px; margin-top: 10px; font-style: italic; color: #e8f5f2; }
 
-  /* Search */
-  .search-container { padding:0 16px; margin-top:-22px; position:relative; z-index:10; }
-  .search-box { background:#fff; border-radius:16px; box-shadow:0 4px 24px rgba(10,110,92,0.15); padding:12px 16px; display:flex; align-items:center; gap:8px; }
-  .search-icon { color:var(--primary); font-size:18px; flex-shrink:0; }
-  .search-box input { flex:1; border:none; outline:none; font-family:'Tajawal',sans-serif; font-size:16px; color:var(--text); background:transparent; }
-  .search-box input::placeholder { color:#aab8b5; }
-  .clear-btn { background:none; border:none; cursor:pointer; color:#aab8b5; font-size:18px; padding:2px; display:none; }
-  .mic-btn { background:none; border:none; cursor:pointer; font-size:20px; padding:2px; flex-shrink:0; transition:all 0.2s; }
-  .mic-btn.listening { animation: pulse 1s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .ticker-wrap { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.2); height: 35px; overflow: hidden; white-space: nowrap; display: flex; align-items: center; }
+  .ticker { display: inline-block; animation: ticker 30s linear infinite; padding-right: 100%; color: #fff; font-size: 13px; font-weight: 500; }
+  @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+  .ticker span { margin: 0 25px; display: inline-flex; align-items: center; }
+  .ticker span::before { content: '•'; margin-left: 8px; color: #4ade80; }
 
-  .filters { padding:16px 16px 0; display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; }
-  .filters::-webkit-scrollbar { display:none; }
-  .filter-btn { flex-shrink:0; padding:7px 16px; border-radius:20px; border:1.5px solid var(--border); background:#fff; font-family:'Tajawal',sans-serif; font-size:13px; font-weight:500; color:var(--text-muted); cursor:pointer; transition:all 0.2s; }
-  .filter-btn.active { background:var(--primary); border-color:var(--primary); color:#fff; }
+  .container { max-width: 600px; margin: -40px auto 0; padding: 0 15px; position: relative; z-index: 10; }
 
-  .stats-bar { padding:12px 16px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-  .stat { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--text-muted); }
-  .stat-dot { width:8px; height:8px; border-radius:50%; }
-  .results-count { padding:0 16px 8px; font-size:12px; color:var(--text-muted); }
-  .cards-container { padding:0 16px 100px; display:flex; flex-direction:column; gap:12px; }
+  .search-box { background: var(--card); border-radius: var(--radius); padding: 8px; display: flex; align-items: center; box-shadow: var(--shadow); margin-bottom: 10px; }
+  .search-box input { flex: 1; border: none; padding: 12px 15px; font-size: 16px; outline: none; background: transparent; }
+  .clear-btn { background: #eee; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: none; margin-left: 5px; color: #666; font-weight: bold; }
 
-  /* Card */
-  .drug-card { background:var(--card); border-radius:16px; padding:16px; box-shadow:var(--shadow); border-right:4px solid transparent; transition:transform 0.15s; animation:fadeIn 0.3s ease; }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-  .drug-card:active { transform:scale(0.98); }
-  .drug-card.available { border-right-color:var(--available); }
-  .drug-card.unavailable { border-right-color:var(--unavailable); }
-  .drug-card.limited { border-right-color:var(--limited); }
-  .drug-card.unlisted { border-right-color:var(--unlisted); }
+  /* ميزة "هل تقصد" */
+  #didYouMean { display: none; background: #fff3cd; color: #856404; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; border: 1px solid #ffeeba; cursor: pointer; }
 
-  .card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; gap:10px; cursor:pointer; }
-  .card-trade-names { font-size:16px; font-weight:800; color:var(--text); line-height:1.4; flex:1; }
-  .card-trade-names .matched { color:var(--primary); }
-  .card-active-name { font-size:12px; color:var(--text-muted); margin-bottom:8px; cursor:pointer; }
+  .stats-info { background: #fff; border-radius: var(--radius); padding: 12px 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; border-right: 4px solid var(--primary); box-shadow: var(--shadow); }
+  .stats-info span b { color: var(--primary); font-size: 16px; }
 
-  .status-badge { flex-shrink:0; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:700; white-space:nowrap; }
-  .status-badge.available { background:#e8f5f0; color:var(--available); }
-  .status-badge.unavailable { background:#fdecea; color:var(--unavailable); }
-  .status-badge.limited { background:#fef9e7; color:var(--limited); }
-  .status-badge.unlisted { background:#e8f4fd; color:var(--unlisted); }
+  .drugs-list { display: grid; gap: 15px; }
 
-  .trade-names { font-size:12px; color:var(--text-muted); line-height:1.6; border-top:1px solid var(--border); padding-top:8px; margin-bottom:8px; cursor:pointer; }
-  .trade-names-label { font-weight:600; color:var(--text); margin-bottom:3px; display:block; }
-  .trade-name-tag { display:inline-block; background:#f0f0f0; padding:2px 8px; border-radius:6px; margin:2px; font-size:11px; color:#444; }
-  .trade-name-tag.highlight { background:#fff3cd; color:#856404; }
+  .drug-card { background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); transition: transform 0.2s; border: 1px solid #edf2f1; position: relative; cursor: pointer; }
+  .drug-card:active { transform: scale(0.98); }
 
-  /* أزرار الكارت */
-  .card-actions { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
-  .card-action-btn { flex:1; min-width:80px; padding:7px 8px; border-radius:10px; border:1.5px solid var(--border); background:#fff; font-family:'Tajawal',sans-serif; font-size:11px; font-weight:600; color:var(--text-muted); cursor:pointer; transition:all 0.2s; text-align:center; }
-  .card-action-btn:hover { border-color:var(--primary); color:var(--primary); background:var(--accent); }
-  .card-action-btn.coming { background:#f8f8f8; color:#bbb; border-color:#eee; font-size:10px; }
+  .status-strip { height: 5px; width: 100%; }
+  .status-strip.available { background-color: var(--available); }
+  .status-strip.unavailable { background-color: var(--unavailable); }
+  .status-strip.limited { background-color: var(--limited); }
+  .status-strip.unlisted { background-color: var(--unlisted); }
 
-  /* زر التثبيت */
-  .pin-btn { width:100%; padding:9px; border-radius:12px; border:1.5px solid var(--border); background:#fff; font-family:'Tajawal',sans-serif; font-size:13px; font-weight:700; color:var(--text-muted); cursor:pointer; transition:all 0.2s; text-align:center; margin-top:10px; }
-  .pin-btn.pinned { background:#fff8e1; border-color:#f9a825; color:#f9a825; }
+  .card-content { padding: 15px; }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .drug-name { font-size: 18px; font-weight: 800; color: var(--primary-dark); }
+  .drug-form { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; color: white; }
 
-  .card-footer { margin-top:8px; font-size:11px; color:#aab8b5; display:flex; align-items:center; gap:4px; }
+  .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee; }
+  .detail-item { font-size: 12px; }
+  .detail-label { color: var(--text-muted); display: block; margin-bottom: 2px; }
+  .detail-val { font-weight: 600; color: #2c3e50; }
 
-  /* Toast */
-  .toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px); background:#1a2e2a; color:#fff; padding:12px 20px; border-radius:12px; font-size:13px; text-align:center; z-index:500; opacity:0; transition:all 0.3s; pointer-events:none; max-width:300px; width:90%; white-space:pre-line; }
-  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  .action-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
+  .btn-action { padding: 10px; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; }
+  .btn-alt { background: var(--accent); color: var(--primary); }
+  .btn-info { background: #f8f9fa; color: #555; }
+  .btn-video { grid-column: span 2; background: #fff5f5; color: #e74c3c; border: 1px solid #ffdada; }
 
-  /* Pinned */
-  .pinned-page { padding:16px 16px 100px; }
-  .pinned-empty { text-align:center; padding:60px 20px; color:var(--text-muted); }
-  .pinned-empty .emoji { font-size:48px; display:block; margin-bottom:16px; }
-  .pinned-empty h3 { font-size:18px; margin-bottom:8px; color:var(--text); }
-  .pinned-empty p { font-size:14px; line-height:1.6; }
+  .pin-btn { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5; transition: 0.3s; }
+  .pin-btn.active { background: var(--primary); color: white; transform: rotate(45deg); }
 
-  .loading { text-align:center; padding:60px 20px; color:var(--text-muted); }
-  .spinner { width:36px; height:36px; border:3px solid var(--border); border-top-color:var(--primary); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 16px; }
-  @keyframes spin { to{transform:rotate(360deg)} }
-  .error-state { text-align:center; padding:40px 20px; color:var(--text-muted); }
-  .retry-btn { margin-top:12px; padding:10px 24px; background:var(--primary); color:#fff; border:none; border-radius:10px; font-family:'Tajawal',sans-serif; font-size:14px; cursor:pointer; }
-  .empty-state { text-align:center; padding:60px 20px; color:var(--text-muted); }
-  .empty-state .emoji { font-size:48px; margin-bottom:16px; display:block; }
-  .empty-state h3 { font-size:18px; margin-bottom:8px; color:var(--text); }
-  .empty-state p { font-size:14px; line-height:1.6; }
+  /* المودال الأصلي */
+  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 100; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+  .modal { background: white; width: 100%; max-width: 500px; border-radius: 20px; overflow: hidden; max-height: 90vh; display: flex; flex-direction: column; }
+  .modal-header { padding: 20px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center; }
+  .modal-body { padding: 20px; overflow-y: auto; }
+  .close-modal { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
 
-  /* Detail */
-  .detail-page { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:var(--bg); z-index:200; overflow-y:auto; }
-  .detail-page.open { display:block; }
-  .detail-header { background:linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%); padding:20px 16px 30px; }
-  .back-btn { background:rgba(255,255,255,0.15); border:none; color:#fff; padding:8px 14px; border-radius:10px; font-family:'Tajawal',sans-serif; font-size:14px; cursor:pointer; margin-bottom:16px; display:flex; align-items:center; gap:6px; }
-  .detail-drug-name { color:#fff; font-size:20px; font-weight:800; margin-bottom:8px; line-height:1.4; }
-  .detail-status { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:700; }
-  .detail-status.available { background:#e8f5f0; color:var(--available); }
-  .detail-status.unavailable { background:#fdecea; color:var(--unavailable); }
-  .detail-status.limited { background:#fef9e7; color:var(--limited); }
-  .detail-status.unlisted { background:#e8f4fd; color:var(--unlisted); }
-  .detail-body { padding:16px 16px 100px; }
-  .detail-section { background:#fff; border-radius:16px; padding:16px; margin-bottom:12px; box-shadow:var(--shadow); }
-  .detail-section-title { font-size:13px; font-weight:700; color:var(--primary); margin-bottom:12px; display:flex; align-items:center; gap:6px; border-bottom:1px solid var(--border); padding-bottom:8px; }
-  .detail-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #f5f5f5; font-size:14px; }
-  .detail-row:last-child { border-bottom:none; }
-  .detail-row-label { color:var(--text-muted); font-size:13px; }
-  .detail-row-value { font-weight:600; color:var(--text); }
-  .coming-soon { text-align:center; padding:20px; color:#ccc; font-size:13px; }
-  .coming-soon span { font-size:28px; display:block; margin-bottom:8px; }
-
-  /* رسالة الدعاء */
-  .prayer-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:1001; align-items:center; justify-content:center; padding:20px; }
-  .prayer-overlay.show { display:flex; }
-  .prayer-box { background:linear-gradient(135deg, #075044, #0a6e5c); border-radius:20px; padding:32px 24px; max-width:340px; width:100%; text-align:center; box-shadow:0 8px 32px rgba(0,0,0,0.3); }
-  .prayer-icon { font-size:48px; display:block; margin-bottom:12px; }
-  .prayer-title { font-size:20px; font-weight:800; color:#fff; margin-bottom:12px; line-height:1.6; }
-  .prayer-btn { width:100%; padding:13px; background:rgba(255,255,255,0.2); color:#fff; border:2px solid rgba(255,255,255,0.4); border-radius:12px; font-family:'Tajawal',sans-serif; font-size:15px; font-weight:700; cursor:pointer; margin-top:8px; }
-
-  /* تحذير البدائل */
-  .alts-warning { background:#fff3cd; border:2px solid #f9a825; border-radius:10px; padding:12px 14px; margin-bottom:12px; font-size:13px; color:#856404; line-height:1.7; }
-  .alts-warning strong { display:block; margin-bottom:4px; font-size:14px; }
-
-  /* لا يوجد بديل */
-  .no-alt { text-align:center; padding:16px; color:var(--text-muted); font-size:14px; }
-  .alt-item { display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:#f8f8f8; border-radius:10px; margin-bottom:6px; font-size:13px; }
-  .alt-name { font-weight:600; color:var(--text); }
-  .alt-badge { padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; }
-  .alt-badge.available { background:#e8f5f0; color:var(--available); }
-  .alt-badge.unavailable { background:#fdecea; color:var(--unavailable); }
-  .alt-badge.limited { background:#fef9e7; color:var(--limited); }
-  .alt-badge.unlisted { background:#e8f4fd; color:var(--unlisted); }
-  .alt-section-label { font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:6px; margin-top:10px; }
-
-  /* فيديو */
-  .video-container { position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:10px; }
-  .video-container iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:none; border-radius:10px; }
-
-  /* نصائح وتحذيرات */
-  .tips-text { font-size:14px; color:var(--text); line-height:1.8; }
-  .warning-text { font-size:14px; color:#c0392b; line-height:1.8; }
-
-  /* Form */
-  .form-page { padding:16px 16px 100px; }
-  .form-card { background:#fff; border-radius:16px; padding:20px; box-shadow:var(--shadow); }
-  .form-title { font-size:18px; font-weight:800; color:var(--primary-dark); margin-bottom:4px; }
-  .form-subtitle { font-size:13px; color:var(--text-muted); margin-bottom:20px; }
-  .form-group { margin-bottom:16px; }
-  .form-label { display:block; font-size:13px; font-weight:600; color:var(--text); margin-bottom:6px; }
-  .form-label .required { color:#c0392b; margin-right:2px; }
-  .form-input { width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:10px; font-family:'Tajawal',sans-serif; font-size:15px; color:var(--text); background:#fff; outline:none; transition:border-color 0.2s; }
-  .form-input:focus { border-color:var(--primary); }
-  .form-select { width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:10px; font-family:'Tajawal',sans-serif; font-size:15px; color:var(--text); background:#fff; outline:none; appearance:none; cursor:pointer; }
-  .form-select:focus { border-color:var(--primary); }
-  .submit-btn { width:100%; padding:14px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-family:'Tajawal',sans-serif; font-size:16px; font-weight:700; cursor:pointer; margin-top:8px; }
-  .submit-btn:disabled { background:#aaa; cursor:not-allowed; }
-  .success-msg { display:none; text-align:center; padding:30px 20px; }
-  .success-msg .emoji { font-size:48px; display:block; margin-bottom:12px; }
-  .success-msg h3 { font-size:18px; font-weight:700; margin-bottom:8px; color:var(--primary); }
-  .success-msg p { font-size:14px; color:var(--text-muted); margin-bottom:20px; }
-  .new-request-btn { padding:12px 24px; background:var(--accent); color:var(--primary); border:none; border-radius:10px; font-family:'Tajawal',sans-serif; font-size:14px; font-weight:600; cursor:pointer; }
-
-  /* Bottom nav */
-  .footer-note { position:fixed; bottom:0; left:0; right:0; background:#fff; z-index:100; }
-  .bottom-nav { display:flex; border-top:1px solid var(--border); }
-  .nav-btn { flex:1; padding:12px 8px; background:none; border:none; border-top:2px solid transparent; font-family:'Tajawal',sans-serif; font-size:12px; font-weight:600; color:var(--text-muted); cursor:pointer; transition:all 0.2s; }
-  .nav-btn.active { color:var(--primary); border-top-color:var(--primary); }
+  .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
 
-<!-- رسالة الدعاء -->
-<div class="prayer-overlay" id="prayerOverlay">
-  <div class="prayer-box">
-    <span class="prayer-icon">🤲</span>
-    <div class="prayer-title">برجاء الدعاء<br>لا تنسونا من صالح دعائكم</div>
-    <button class="prayer-btn" onclick="closePrayer()">آمين 🌿</button>
+<header>
+  <h1>دليل أدوية نفقة الدولة</h1>
+  <p>تابع توفر علاجك والبدائل المتاحة لحظة بلحظة</p>
+  <div class="welcome-msg">"اللهم رب الناس، أذهب الباس، اشف أنت الشافي، لا شفاء إلا شفاؤك"</div>
+  <div class="ticker-wrap">
+    <div class="ticker" id="ticker">جاري تحميل آخر التوريدات...</div>
   </div>
+</header>
+
+<div class="container">
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="ابحث باسم الدواء أو المادة الفعالة...">
+    <button class="clear-btn" id="clearBtn" onclick="clearSearch()">✕</button>
+  </div>
+
+  <div id="didYouMean"></div>
+
+  <div class="stats-info">
+    <span>إجمالي الأدوية: <b id="totalCount">...</b></span>
+    <span>آخر تحديث: <b id="lastUpdate">...</b></span>
+  </div>
+
+  <div id="loader" class="loader"></div>
+  <div id="drugsList" class="drugs-list"></div>
 </div>
 
-<!-- تنويه -->
-<div class="notice-overlay" id="noticeOverlay">
-  <div class="notice-box">
-    <span class="notice-icon">ℹ️</span>
-    <div class="notice-title">تنويه هام</div>
-    <div class="notice-text">
-      البيانات المعروضة <strong>استرشادية فقط</strong>.<br><br>
-      توفر الأصناف يخضع لحركة صرف الصنف بالصيدلية وتوريد المخازن والشركات، وقد يتغير في أي وقت.
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3 id="modalTitle">التفاصيل</h3>
+      <button class="close-modal" onclick="closeModal()">✕</button>
     </div>
-    <div class="notice-sub">📋 البيانات للاستئناس فقط</div>
-    <button class="notice-btn" onclick="closeNotice()">حسناً، فهمت ✓</button>
-  </div>
-</div>
-
-<!-- Toast -->
-<div class="toast" id="toast"></div>
-
-<div class="header">
-  <span class="header-icon">💊</span>
-  <h1>صيدلية نفقة الدولة</h1>
-  <p>استعلم عن توفر دوائك قبل الزيارة</p>
-  <p id="visitCounter" style="color:rgba(255,255,255,0.6);font-size:12px;margin-top:4px"></p>
-  <p id="lastUpdateBadge" style="color:rgba(255,255,255,0.5);font-size:11px;margin-top:2px"></p>
-</div>
-
-<!-- شريط التوريدات - سيُنقل تحت البحث بواسطة JS -->
-<div class="ticker-wrap" id="tickerWrap" style="display:none">
-  <div class="ticker" id="tickerContent"></div>
-</div>
-
-<!-- صفحة البحث -->
-<div id="searchPage">
-  <div class="search-container">
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="searchInput" placeholder="ابحث بالاسم التجاري أو المادة الفعالة..." autocomplete="off">
-      <button class="clear-btn" id="clearBtn" onclick="clearSearch()">✕</button>
-      <button class="mic-btn" id="micBtn" onclick="startVoiceSearch()" title="بحث صوتي">🎤</button>
-    </div>
-  </div>
-
-  <!-- شريط التوريدات تحت البحث مباشرة -->
-  <div id="tickerPlaceholder"></div>
-  <div class="filters">
-    <button class="filter-btn active" onclick="setFilter('all', this)">الكل</button>
-    <button class="filter-btn" onclick="setFilter('available', this)">✅ متوفر</button>
-    <button class="filter-btn" onclick="setFilter('unavailable', this)">❌ غير متوفر</button>
-  </div>
-  <div class="stats-bar" id="statsBar" style="display:none">
-    <div class="stat"><div class="stat-dot" style="background:var(--available)"></div><span id="availableCount">0</span> متوفر</div>
-    <div class="stat"><div class="stat-dot" style="background:var(--limited)"></div><span id="limitedCount">0</span> محدود</div>
-    <div class="stat"><div class="stat-dot" style="background:var(--unavailable)"></div><span id="unavailableCount">0</span> غير متوفر</div>
-  </div>
-  <div class="results-count" id="resultsCount"></div>
-  <div class="cards-container" id="cardsContainer">
-    <div class="loading"><div class="spinner"></div><p>جاري تحميل البيانات...</p></div>
-  </div>
-</div>
-
-<!-- صفحة المثبتة -->
-<div id="pinnedPage" style="display:none">
-  <div class="pinned-page"><div id="pinnedCards"></div></div>
-</div>
-
-<!-- صفحة الفورم -->
-<div id="formPage" style="display:none">
-  <div class="form-page">
-    <div class="form-card">
-      <div id="formContent">
-        <div class="form-title">➕ طلب إضافة دواء</div>
-        <div class="form-subtitle">أدخل بيانات الدواء لتسجيله في قاعدة البيانات</div>
-        <div class="form-group">
-          <label class="form-label">اسم الدواء <span class="required">*</span></label>
-          <input type="text" class="form-input" id="f-drug" placeholder="الاسم التجاري أو المادة الفعالة">
-        </div>
-        <div class="form-group">
-          <label class="form-label">التركيز <span class="required">*</span></label>
-          <input type="text" class="form-input" id="f-conc" placeholder="مثال: 50 mg أو 500 mg/5ml">
-        </div>
-        <div class="form-group">
-          <label class="form-label">الشكل الدوائي <span class="required">*</span></label>
-          <select class="form-select" id="f-form">
-            <option value="">اختر الشكل الدوائي</option>
-            <option>أقراص/كبسول</option>
-            <option>حقن/أمبول</option>
-            <option>شراب</option>
-            <option>كريم/مرهم</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">اسم المريض</label>
-          <input type="text" class="form-input" id="f-patient" placeholder="اختياري">
-        </div>
-        <div class="form-group">
-          <label class="form-label">نوع القرار <span class="required">*</span></label>
-          <input type="text" class="form-input" id="f-decision" placeholder="مثال: ضغط، سكر، قصور شريان تاجي">
-        </div>
-        <div id="formError" style="display:none;color:#c0392b;font-size:13px;margin-bottom:12px;padding:10px;background:#fdecea;border-radius:8px"></div>
-        <button class="submit-btn" id="submitBtn" onclick="submitForm()">إرسال الطلب</button>
-      </div>
-      <div class="success-msg" id="successMsg">
-        <span class="emoji">✅</span>
-        <h3>تم إرسال الطلب بنجاح!</h3>
-        <p>رقم طلبك: <strong id="requestNum"></strong><br>سيتم مراجعة طلبك من قِبل الصيدلية</p>
-        <button class="new-request-btn" onclick="resetForm()">طلب جديد</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Bottom Nav -->
-<div class="footer-note">
-  <div class="bottom-nav">
-    <button class="nav-btn active" id="nav-search" onclick="showPage('search')">🔍 البحث</button>
-    <button class="nav-btn" id="nav-pinned" onclick="showPage('pinned')">⭐ أصنافي</button>
-    <button class="nav-btn" id="nav-form" onclick="showPage('form')">➕ طلب إضافة</button>
-  </div>
-</div>
-
-<!-- صفحة التفاصيل -->
-<div class="detail-page" id="detailPage">
-  <div class="detail-header">
-    <button class="back-btn" onclick="closeDetail()">→ رجوع</button>
-    <div class="detail-drug-name" id="detailName"></div>
-    <div id="detailStatus"></div>
-  </div>
-  <div class="detail-body">
-    <div class="detail-section">
-      <div class="detail-section-title">💊 معلومات الدواء</div>
-      <div class="detail-row"><span class="detail-row-label">المادة الفعالة</span><span class="detail-row-value" id="d-active"></span></div>
-      <div class="detail-row"><span class="detail-row-label">التركيز</span><span class="detail-row-value" id="d-conc"></span></div>
-      <div class="detail-row"><span class="detail-row-label">الشكل الدوائي</span><span class="detail-row-value" id="d-form"></span></div>
-      <div class="detail-row"><span class="detail-row-label">آخر تحديث</span><span class="detail-row-value" id="d-update"></span></div>
-      <div style="margin-top:12px">
-        <button class="pin-btn" id="d-pin-btn">⭐ تثبيت الصنف</button>
-      </div>
-    </div>
-    <div class="detail-section">
-      <div class="detail-section-title">🏷️ الأسماء التجارية المتاحة</div>
-      <div id="d-tradeNames"></div>
-    </div>
-    <div class="detail-section" id="d-tips-section">
-      <div class="detail-section-title">📝 نصائح الاستخدام</div>
-      <div id="d-tips"></div>
-    </div>
-    <div class="detail-section" id="d-warnings-section">
-      <div class="detail-section-title">⚠️ تحذيرات</div>
-      <div id="d-warnings"></div>
-    </div>
-    <div class="detail-section" id="d-alts-therapeutic-section">
-      <div class="detail-section-title">🔄 بدائل المجموعة العلاجية</div>
-      <div id="d-alts-therapeutic"></div>
-    </div>
-    <div class="detail-section" id="d-alts-general-section">
-      <div class="detail-section-title">🔄 بدائل عامة</div>
-      <div id="d-alts-general"></div>
-    </div>
-    <div class="detail-section" id="d-video-section">
-      <div class="detail-section-title">🎥 فيديو شرح</div>
-      <div id="d-video"></div>
-    </div>
+    <div class="modal-body" id="modalBody"></div>
   </div>
 </div>
 
 <script>
-  const SHEET_ID = '1j-iFjm2bZYdLAc_-VSQatuVyZCnp1z0gIoYGO52H_BA';
-  const SHEET_NAME = 'Drug status 1st version';
-  const API_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyY-NwiUDcj6quXHcY3i_RANnTUWyq2ImXVX9OOQb49R20os9PVcnqTmjxDVptmw91H/exec';
+  // ⚠️ ضع رابط الـ Web App الخاص بك هنا
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwx5mDI7gZb4TN7K3NnMfCwntiJZreqob6f9rmVKVAGXpoEzyXB8qjA_ZfmOj6pGcil/exec'; 
 
   let allDrugs = [];
-  let currentFilter = 'all';
-  let searchQuery = '';
-  let searchTimer = null;
   let pinnedDrugs = JSON.parse(localStorage.getItem('pinnedDrugs') || '[]');
-  let currentDetailIndex = -1;
+  let searchQuery = '';
+  let searchTimer;
 
-  // ===== رسالة الدعاء =====
-  function closePrayer() {
-    document.getElementById('prayerOverlay').classList.remove('show');
-    sessionStorage.setItem('prayerSeen', '1');
-  }
-
-  // ===== تنويه =====
-  window.addEventListener('load', () => {
-    if (!sessionStorage.getItem('noticeSeen')) {
-      document.getElementById('noticeOverlay').classList.add('show');
-    } else if (!sessionStorage.getItem('prayerSeen')) {
-      setTimeout(() => document.getElementById('prayerOverlay').classList.add('show'), 3000);
-    }
-    logVisit();
-    loadVisitCount();
-  });
-
-  function closeNotice() {
-    document.getElementById('noticeOverlay').classList.remove('show');
-    sessionStorage.setItem('noticeSeen', '1');
-    if (!sessionStorage.getItem('prayerSeen')) {
-      setTimeout(() => document.getElementById('prayerOverlay').classList.add('show'), 1000);
-    }
-  }
-
-  // ===== Toast =====
-  function showToast(msg, duration = 4000) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), duration);
-  }
-
-  // ===== إحصائيات =====
-  function logStats(drugName, concentration, type) {
-    fetch(SCRIPT_URL, {
-      method: 'POST', mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'stats', drugName, concentration, type })
-    }).catch(() => {});
-  }
-
-  function logVisit() {
-    fetch(SCRIPT_URL, {
-      method: 'POST', mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'visit' })
-    }).catch(() => {});
-  }
-
-  async function loadVisitCount() {
+  async function fetchDrugs() {
     try {
-      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent('إحصائيات الزيارات')}&range=A2`;
-      const res = await fetch(url);
-      const text = await res.text();
-      const json = JSON.parse(text.substring(47).slice(0, -2));
-      const count = json?.table?.rows[0]?.c[0]?.v || 0;
-      if (count > 0) {
-        document.getElementById('visitCounter').textContent = `👥 ${Math.round(count).toLocaleString('ar-EG')} زيارة`;
-      }
-    } catch(e) {}
-  }
-
-  // ===== تحويل حالة التوفر =====
-  function normalizeStatus(raw) {
-    if (!raw) return { key: 'unlisted', label: '🔵 غير مدرج بالصيدلية' };
-    const r = raw.trim().toLowerCase();
-    if (['متوفر','موجود','available'].includes(r)) return { key: 'available', label: '✅ متوفر' };
-    if (['كمية صغيرة','كمية محدودة','limited','باقي كمية صغيرة'].includes(r)) return { key: 'limited', label: '⚠️ باقي كمية صغيرة' };
-    if (['غير متوفر','غير موجود','نفد','not available'].includes(r)) return { key: 'unavailable', label: '❌ غير متوفر — في انتظار التوريد' };
-    if (['غير مدرج','لا يصرف','not listed'].includes(r)) return { key: 'unlisted', label: '🔵 غير مدرج بالصيدلية' };
-    return { key: 'unlisted', label: '🔵 ' + raw };
-  }
-
-  // ===== تحميل البيانات =====
-  async function loadData() {
-    try {
-      const res = await fetch(API_URL);
-      const text = await res.text();
-      const json = JSON.parse(text.substring(47).slice(0, -2));
-      const rows = json.table.rows;
-
-      allDrugs = rows.map(row => ({
-        activeName: getCellValue(row, 0),
-        concentration: getCellValue(row, 1),
-        form: getCellValue(row, 2),
-        tradeNames: getCellValue(row, 3),
-        availability: getCellValue(row, 4),
-        lastUpdate: getCellValue(row, 5),
-        altsTherapeutic: getCellValue(row, 6),
-        altsGeneral: getCellValue(row, 7),
-        tips: getCellValue(row, 8),
-        warnings: getCellValue(row, 9),
-        video: getCellValue(row, 10),
-      })).filter(d => d.activeName);
-
-      allDrugs.sort((a, b) => {
-        if (!a.lastUpdate) return 1;
-        if (!b.lastUpdate) return -1;
-        return parseDate(b.lastUpdate) - parseDate(a.lastUpdate);
-      });
-
-      // آخر تحديث في الهيدر
-      const latestUpdate = allDrugs.find(d => d.lastUpdate);
-      if (latestUpdate) {
-        document.getElementById('lastUpdateBadge').textContent = `🕐 آخر تحديث للبيانات: ${timeAgo(latestUpdate.lastUpdate)}`;
-      }
-
-      updateStats();
+      const response = await fetch(SCRIPT_URL);
+      const data = await response.json();
+      allDrugs = data.slice(1).map(row => ({
+        activeName: row[0], concentration: row[1], pharmaceuticalForm: row[2],
+        status: row[3], alternativesTherapeutic: row[4], alternativesGeneral: row[5],
+        tips: row[6], warnings: row[7], videoUrl: row[8], lastUpdate: row[9], isNew: row[10] === 'نعم'
+      }));
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('totalCount').innerText = allDrugs.length;
+      document.getElementById('lastUpdate').innerText = allDrugs[0]?.lastUpdate || '-';
+      updateTicker();
       renderCards();
-      buildTicker();
-    } catch (e) {
-      document.getElementById('cardsContainer').innerHTML = `
-        <div class="error-state">
-          <span style="font-size:40px">⚠️</span>
-          <p style="margin-top:12px">تعذر تحميل البيانات<br>تأكد من اتصالك بالإنترنت</p>
-          <button class="retry-btn" onclick="loadData()">إعادة المحاولة</button>
-        </div>`;
-    }
+    } catch (e) { console.error(e); }
   }
 
-  function getCellValue(row, index) {
-    try { return row.c[index]?.v?.toString().trim() || ''; }
-    catch { return ''; }
+  function updateTicker() {
+    const news = allDrugs.filter(d => d.isNew).slice(0, 5);
+    document.getElementById('ticker').innerHTML = news.length > 0 ? 
+      news.map(d => `<span>توفر حديثاً: ${d.activeName}</span>`).join('') :
+      '<span>مرحباً بكم في صيدلية نفقة الدولة</span>';
   }
 
-  function parseDate(dateStr) {
-    if (!dateStr) return 0;
-    const s = dateStr.toString().trim();
-    const m = s.match(/Date\((\d+),(\d+),(\d+),(\d+),(\d+),(\d+)\)/);
-    if (m) return new Date(+m[1], +m[2], +m[3], +m[4], +m[5], +m[6]).getTime();
-    const m2 = s.match(/Date\((\d+),(\d+),(\d+)\)/);
-    if (m2) return new Date(+m2[1], +m2[2], +m2[3]).getTime();
-    const p = s.split(' ');
-    if (p.length === 2) {
-      const d = p[0].split('-');
-      const t = p[1].split(':');
-      if (d.length === 3 && t.length === 2) return new Date(+d[0], +d[1]-1, +d[2], +t[0], +t[1]).getTime();
-    }
-    return 0;
-  }
-
-  // ===== شريط التوريدات =====
-  function buildTicker() {
-    const recent = allDrugs
-      .filter(d => {
-        const ts = parseDate(d.lastUpdate);
-        if (!ts) return false;
-        const diff = (Date.now() - ts) / (1000 * 60 * 60 * 24);
-        return diff <= 14 && normalizeStatus(d.availability).key === 'available';
-      })
-      .slice(0, 10);
-
-    if (recent.length === 0) return;
-
-    const items = recent.map(d =>
-      `<span class="ticker-item"><span class="ticker-label">✅ توفر حديثاً:</span> <span class="ticker-name">${d.activeName} ${d.concentration}</span> <span class="ticker-status">•</span></span>`
-    ).join('');
-
-    const tickerWrap = document.getElementById('tickerWrap');
-    document.getElementById('tickerContent').innerHTML = items + items;
-    tickerWrap.style.display = 'block';
-
-    // انقل الشريط تحت البحث
-    const placeholder = document.getElementById('tickerPlaceholder');
-    if (placeholder) placeholder.appendChild(tickerWrap);
-  }
-
-  // ===== إحصائيات =====
-  function updateStats() {
-    const available = allDrugs.filter(d => normalizeStatus(d.availability).key === 'available').length;
-    const limited = allDrugs.filter(d => normalizeStatus(d.availability).key === 'limited').length;
-    const unavailable = allDrugs.filter(d => ['unavailable','unlisted'].includes(normalizeStatus(d.availability).key)).length;
-    document.getElementById('availableCount').textContent = available;
-    document.getElementById('limitedCount').textContent = limited;
-    document.getElementById('unavailableCount').textContent = unavailable;
-    document.getElementById('statsBar').style.display = 'flex';
-  }
-
-  // ===== تصفية =====
-  function getFilteredDrugs() {
-    let drugs = [...allDrugs];
-    if (currentFilter === 'available') {
-      drugs = drugs.filter(d => ['available','limited'].includes(normalizeStatus(d.availability).key));
-    } else if (currentFilter === 'unavailable') {
-      drugs = drugs.filter(d => ['unavailable','unlisted'].includes(normalizeStatus(d.availability).key));
-    }
-    if (searchQuery.trim()) {
-      const q = searchQuery.trim().toLowerCase();
-      drugs = drugs.filter(d =>
-        d.activeName.toLowerCase().includes(q) ||
-        d.tradeNames.toLowerCase().includes(q) ||
-        d.form.toLowerCase().includes(q)
-      );
-    }
-    return drugs;
-  }
-
-  // ===== بناء الكارت =====
-  function buildCard(drug, index) {
-    const status = normalizeStatus(drug.availability);
-    const isPinned = pinnedDrugs.includes(index);
-    const q = searchQuery.trim().toLowerCase();
-
-    const tradeList = drug.tradeNames
-      ? drug.tradeNames.split(',').map(n => n.trim()).filter(n => n)
-      : [];
-
-    let matchedName = '';
-    if (q) matchedName = tradeList.find(n => n.toLowerCase().includes(q)) || '';
-
-    let mainTitle = '';
-    if (matchedName) {
-      mainTitle = `<span class="matched">${matchedName}</span>`;
-    } else {
-      const shown = tradeList.slice(0, 3).join(' | ');
-      mainTitle = shown + (tradeList.length > 3 ? ' <span style="color:var(--text-muted)">...</span>' : '');
-    }
-
-    const smallNames = tradeList
-      .filter(n => n !== matchedName)
-      .map(n => {
-        const isHL = q && n.toLowerCase().includes(q);
-        return `<span class="trade-name-tag ${isHL ? 'highlight' : ''}">${n}</span>`;
-      }).join('');
-
-    const lastUpdateHtml = drug.lastUpdate
-      ? `<div class="card-footer">🕐 آخر تحديث: ${timeAgo(drug.lastUpdate)}</div>`
-      : '';
-
-    // أزرار سريعة دائماً ظاهرة
-    const hasTips = drug.tips && drug.tips.trim();
-    const hasWarnings = drug.warnings && drug.warnings.trim();
-    const hasAltsT = drug.altsTherapeutic && drug.altsTherapeutic.trim();
-    const hasAltsG = drug.altsGeneral && drug.altsGeneral.trim();
-    const hasVideo = drug.video && drug.video.trim();
-
-    const actionBtns = `
-      <button class="card-action-btn ${hasTips ? '' : 'coming'}" onclick="openDetailSection(event,${index},'tips','tips_click')">
-        📝 ${hasTips ? 'نصائح' : 'نصائح قريباً'}
-      </button>
-      <button class="card-action-btn ${hasWarnings ? '' : 'coming'}" onclick="openDetailSection(event,${index},'warnings','warnings_click')">
-        ⚠️ ${hasWarnings ? 'تحذيرات' : 'تحذيرات قريباً'}
-      </button>
-      <button class="card-action-btn ${hasAltsT ? '' : 'coming'}" onclick="openDetailSection(event,${index},'alts-therapeutic','alts_therapeutic_click')">
-        🔄 ${hasAltsT ? 'بدائل المجموعة' : 'بدائل المجموعة قريباً'}
-      </button>
-      <button class="card-action-btn ${hasAltsG ? '' : 'coming'}" onclick="openDetailSection(event,${index},'alts-general','alts_general_click')">
-        🔄 ${hasAltsG ? 'بدائل عامة' : 'بدائل عامة قريباً'}
-      </button>
-      <button class="card-action-btn ${hasVideo ? '' : 'coming'}" onclick="openDetailSection(event,${index},'video','video_click')">
-        🎥 ${hasVideo ? 'فيديو شرح' : 'فيديو قريباً'}
-      </button>`;
-
-    return `
-      <div class="drug-card ${status.key}">
-        <div class="card-header" onclick="openDetail(${index})">
-          <div class="card-trade-names">${mainTitle || drug.activeName}</div>
-          <div class="status-badge ${status.key}">${status.label}</div>
-        </div>
-        <div class="card-active-name" onclick="openDetail(${index})">🧪 ${drug.activeName}${drug.concentration ? ' • ' + drug.concentration : ''}${drug.form ? ' • ' + getFormEmoji(drug.form) + ' ' + drug.form : ''}</div>
-        ${smallNames ? `<div class="trade-names" onclick="openDetail(${index})"><span class="trade-names-label">الأسماء التجارية:</span>${smallNames}</div>` : ''}
-        ${lastUpdateHtml}
-        <button class="pin-btn ${isPinned ? 'pinned' : ''}" onclick="togglePin(event, ${index})">
-          ${isPinned ? '✅ تم التثبيت' : '⭐ تثبيت الصنف'}
-        </button>
-        <div class="card-actions">${actionBtns}</div>
-      </div>`;
-  }
-
-  // ===== عرض الكروت =====
   function renderCards() {
-    const drugs = getFilteredDrugs();
-    const container = document.getElementById('cardsContainer');
-    const resultsCount = document.getElementById('resultsCount');
-    if (drugs.length === 0) {
-      resultsCount.textContent = '';
-      container.innerHTML = `<div class="empty-state"><span class="emoji">🔍</span><h3>لا توجد نتائج</h3><p>جرب البحث بالاسم التجاري<br>أو المادة الفعالة باللغتين</p></div>`;
-      // تسجيل البحث بدون نتائج
-      if (searchQuery.trim().length > 2) {
-        fetch(SCRIPT_URL, {
-          method: 'POST', mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'zeroresult', query: searchQuery.trim() })
-        }).catch(() => {});
-      }
-      return;
-    }
-    resultsCount.textContent = `${drugs.length} نتيجة`;
-    container.innerHTML = drugs.map(drug => buildCard(drug, allDrugs.indexOf(drug))).join('');
-  }
+    const list = document.getElementById('drugsList');
+    const filtered = getFilteredDrugs();
+    
+    // ميزة "هل تقصد"
+    handleSmartSearch(searchQuery.toLowerCase().trim(), filtered);
 
-  // ===== تثبيت الصنف =====
-  function togglePin(event, index) {
-    event.stopPropagation();
-    const drug = allDrugs[index];
-    if (!drug) return;
-    const i = pinnedDrugs.indexOf(index);
-    if (i === -1) {
-      pinnedDrugs.push(index);
-      logStats(drug.activeName, drug.concentration, 'pin');
-      showToast('✅ تم تثبيت الصنف!\nبرجاء استخدام نفس الجهاز والمتصفح\nللاحتفاظ بأصنافك المثبتة');
-    } else {
-      pinnedDrugs.splice(i, 1);
-      showToast('تم إلغاء تثبيت الصنف');
-    }
-    localStorage.setItem('pinnedDrugs', JSON.stringify(pinnedDrugs));
-    renderCards();
-    renderPinned();
-  }
-
-  // ===== صفحة المثبتة =====
-  function renderPinned() {
-    const container = document.getElementById('pinnedCards');
-    const valid = pinnedDrugs.filter(i => allDrugs[i]);
-    if (valid.length === 0) {
-      container.innerHTML = `<div class="pinned-empty"><span class="emoji">⭐</span><h3>لا توجد أصناف مثبتة</h3><p>اضغط "⭐ تثبيت الصنف" على أي دواء<br>ليظهر هنا في كل زيارة</p></div>`;
-      return;
-    }
-    container.innerHTML = valid.map(i => buildCard(allDrugs[i], i)).join('');
-  }
-
-  // ===== البدائل =====
-  function buildAltsHtml(altsStr) {
-    if (!altsStr || !altsStr.trim()) return '<div class="coming-soon"><span>🔄</span>قريباً</div>';
-    const s = altsStr.trim().toLowerCase();
-    if (s === 'none' || s === 'لا يوجد' || s === 'لا يوجد بديل') {
-      return '<div class="no-alt">🚫 لا يوجد بديل حالياً</div>';
-    }
-    const items = altsStr.split(',').map(s => s.trim()).filter(s => s);
-    if (items.length === 0) return '<div class="coming-soon"><span>🔄</span>قريباً</div>';
-
-    return items.map(item => {
-      const parts = item.match(/^(.+?)\s+([\d.]+\s*\S+)$/);
-      let found = null;
-      let foundIndex = -1;
-      if (parts) {
-        foundIndex = allDrugs.findIndex(d =>
-          d.activeName.toLowerCase() === parts[1].trim().toLowerCase() &&
-          d.concentration.toLowerCase().includes(parts[2].trim().toLowerCase())
-        );
-      }
-      if (foundIndex === -1) foundIndex = allDrugs.findIndex(d => d.activeName.toLowerCase() === item.toLowerCase());
-      found = foundIndex !== -1 ? allDrugs[foundIndex] : null;
-
-      if (found) {
-        const st = normalizeStatus(found.availability);
-        return `<div class="alt-item" onclick="openDetail(${foundIndex})" style="cursor:pointer">
-          <span class="alt-name">${item} <span style="font-size:10px;color:var(--primary)">← اضغط للتفاصيل</span></span>
-          <span class="alt-badge ${st.key}">${st.label}</span>
-        </div>`;
-      } else {
-        return `<div class="alt-item"><span class="alt-name">${item}</span><span class="alt-badge unlisted">🔵 غير مدرج</span></div>`;
-      }
+    list.innerHTML = filtered.map((drug) => {
+      const isPinned = pinnedDrugs.includes(drug.activeName + drug.concentration);
+      const realIndex = allDrugs.indexOf(drug);
+      return `
+        <div class="drug-card" onclick="openDetail(${realIndex}, 'click')">
+          <div class="status-strip ${getStatusClass(drug.status)}"></div>
+          <button class="pin-btn ${isPinned ? 'active' : ''}" onclick="togglePin(event, '${drug.activeName + drug.concentration}')">📌</button>
+          <div class="card-content">
+            <div class="card-header">
+              <div class="drug-name">${drug.activeName}</div>
+              <span class="status-badge" style="background:${getStatusColor(drug.status)}">${drug.status}</span>
+            </div>
+            <div class="drug-form">${drug.pharmaceuticalForm} | ${drug.concentration}</div>
+            <div class="action-btns">
+              <button class="btn-action btn-alt" onclick="openDetailSection(event, ${realIndex}, 'alternatives', 'alts_therapeutic_click')">🔍 البدائل</button>
+              <button class="btn-action btn-info" onclick="openDetailSection(event, ${realIndex}, 'tips', 'tips_click')">💡 نصائح</button>
+              <button class="btn-action btn-video" onclick="openDetailSection(event, ${realIndex}, 'video', 'video_click')">📺 فيديو</button>
+            </div>
+          </div>
+        </div>
+      `;
     }).join('');
   }
 
-  function buildAltsSection(altsStr) {
-    const warning = `<div class="alts-warning"><strong>⚠️ تنبيه مهم:</strong>لا تقم بتغيير دوائك من نفسك — استشر طبيبك أولاً لتجنب أي آثار جانبية أو مضاعفات.</div>`;
-    const content = buildAltsHtml(altsStr);
-    return warning + content;
-  }
-
-  // ===== صفحة التفاصيل =====
-  function openDetail(index, scrollTo = null, fromButton = false) {
-    currentDetailIndex = index;
-    const drug = allDrugs[index];
-    if (!drug) return;
-
-    // سجّل click فقط إذا لم يكن من زر
-    if (!fromButton) logStats(drug.activeName, drug.concentration, 'click');
-
-    const status = normalizeStatus(drug.availability);
-    document.getElementById('detailName').textContent = drug.activeName;
-    document.getElementById('detailStatus').innerHTML = `<div class="detail-status ${status.key}">${status.label}</div>`;
-    document.getElementById('d-active').textContent = drug.activeName || '—';
-    document.getElementById('d-conc').textContent = drug.concentration || '—';
-    document.getElementById('d-form').textContent = drug.form ? `${getFormEmoji(drug.form)} ${drug.form}` : '—';
-    document.getElementById('d-update').textContent = drug.lastUpdate ? timeAgo(drug.lastUpdate) : '—';
-
-    // زر التثبيت
-    const isPinned = pinnedDrugs.includes(index);
-    const pinBtn = document.getElementById('d-pin-btn');
-    pinBtn.textContent = isPinned ? '✅ تم التثبيت' : '⭐ تثبيت الصنف';
-    pinBtn.className = 'pin-btn ' + (isPinned ? 'pinned' : '');
-    pinBtn.onclick = (e) => togglePin(e, index);
-
-    // الأسماء التجارية
-    const tradesEl = document.getElementById('d-tradeNames');
-    if (drug.tradeNames) {
-      tradesEl.innerHTML = drug.tradeNames.split(',').map(n => n.trim()).filter(n => n)
-        .map(n => `<span class="trade-name-tag">${n}</span>`).join('');
-    } else {
-      tradesEl.innerHTML = '<div class="coming-soon"><span>🏷️</span>لا توجد أسماء مسجلة</div>';
-    }
-
-    // نصائح
-    document.getElementById('d-tips').innerHTML = drug.tips && drug.tips.trim()
-      ? `<div class="tips-text">${drug.tips}</div>`
-      : '<div class="coming-soon"><span>📝</span>قريباً</div>';
-
-    // تحذيرات
-    document.getElementById('d-warnings').innerHTML = drug.warnings && drug.warnings.trim()
-      ? `<div class="warning-text">⚠️ ${drug.warnings}</div>`
-      : '<div class="coming-soon"><span>⚠️</span>قريباً</div>';
-
-    // بدائل المجموعة العلاجية
-    document.getElementById('d-alts-therapeutic').innerHTML = drug.altsTherapeutic && drug.altsTherapeutic.trim()
-      ? buildAltsSection(drug.altsTherapeutic)
-      : '<div class="coming-soon"><span>🔄</span>قريباً</div>';
-
-    // بدائل عامة
-    document.getElementById('d-alts-general').innerHTML = drug.altsGeneral && drug.altsGeneral.trim()
-      ? buildAltsSection(drug.altsGeneral)
-      : '<div class="coming-soon"><span>🔄</span>قريباً</div>';
-
-    // فيديو
-    if (drug.video && drug.video.trim()) {
-      const videoId = extractYoutubeId(drug.video);
-      document.getElementById('d-video').innerHTML = videoId
-        ? `<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe></div>`
-        : `<a href="${drug.video}" target="_blank" style="color:var(--primary)">🎥 افتح الفيديو</a>`;
-    } else {
-      document.getElementById('d-video').innerHTML = '<div class="coming-soon"><span>🎥</span>قريباً</div>';
-    }
-
-    document.getElementById('detailPage').classList.add('open');
-    document.body.style.overflow = 'hidden';
-
-    // التمرير للقسم المطلوب
-    if (scrollTo) {
-      setTimeout(() => {
-        const sectionMap = {
-          'tips': 'd-tips-section',
-          'warnings': 'd-warnings-section',
-          'alts': 'd-alts-therapeutic-section',
-          'alts-therapeutic': 'd-alts-therapeutic-section',
-          'alts-general': 'd-alts-general-section',
-          'video': 'd-video-section'
-        };
-        const el = document.getElementById(sectionMap[scrollTo]);
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 150);
+  // ميزة "هل تقصد" باستخدام خوارزمية Levenshtein
+  function handleSmartSearch(query, filtered) {
+    const dym = document.getElementById('didYouMean');
+    dym.style.display = 'none';
+    if (query.length > 2 && filtered.length === 0) {
+      let bestMatch = null;
+      let minDistance = 3;
+      allDrugs.forEach(d => {
+        let dist = levenshtein(query, d.activeName.toLowerCase());
+        if (dist < minDistance) { minDistance = dist; bestMatch = d.activeName; }
+      });
+      if (bestMatch) {
+        dym.innerHTML = `هل تقصد: <b>${bestMatch}</b>؟`;
+        dym.style.display = 'block';
+        dym.onclick = () => { document.getElementById('searchInput').value = bestMatch; searchQuery = bestMatch; renderCards(); };
+      }
     }
   }
 
-  function openDetailSection(event, index, section, statType = null) {
+  function levenshtein(a, b) {
+    const tmp = [];
+    for (let i = 0; i <= a.length; i++) tmp[i] = [i];
+    for (let j = 0; j <= b.length; j++) tmp[0][j] = j;
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        tmp[i][j] = Math.min(tmp[i-1][j]+1, tmp[i][j-1]+1, tmp[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+      }
+    }
+    return tmp[a.length][b.length];
+  }
+
+  // تسجيل الإحصائيات (الإصلاح المطلوب)
+  function logStats(name, conc, type) {
+    const url = `${SCRIPT_URL}?name=${encodeURIComponent(name)}&conc=${encodeURIComponent(conc)}&type=${encodeURIComponent(type)}`;
+    fetch(url, { mode: 'no-cors' });
+  }
+
+  function openDetailSection(event, index, section, statType) {
     event.stopPropagation();
     const drug = allDrugs[index];
-    if (drug && statType) {
-      logStats(drug.activeName, drug.concentration, statType);
-    }
-    openDetail(index, section, true); // true = من زر، لا تسجل click
+    logStats(drug.activeName, drug.concentration, statType);
+    openDetail(index);
   }
 
-  function extractYoutubeId(url) {
-    const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
-    return m ? m[1] : null;
+  function openDetail(index, type = null) {
+    const drug = allDrugs[index];
+    if (type) logStats(drug.activeName, drug.concentration, type);
+    document.getElementById('modalTitle').innerText = drug.activeName;
+    document.getElementById('modalBody').innerHTML = `
+      <p><b>الحالة:</b> ${drug.status}</p>
+      <p><b>البدائل:</b> ${drug.alternativesTherapeutic}</p>
+      <p><b>نصائح:</b> ${drug.tips || 'قريباً'}</p>
+    `;
+    document.getElementById('modalOverlay').style.display = 'flex';
   }
 
-  function closeDetail() {
-    document.getElementById('detailPage').classList.remove('open');
-    document.body.style.overflow = '';
+  function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
+
+  function getFilteredDrugs() {
+    const query = searchQuery.toLowerCase().trim();
+    return allDrugs.filter(d => d.activeName.toLowerCase().includes(query) || d.alternativesTherapeutic.toLowerCase().includes(query));
   }
 
-  // ===== فورم =====
-  async function submitForm() {
-    const drug = document.getElementById('f-drug').value.trim();
-    const conc = document.getElementById('f-conc').value.trim();
-    const form = document.getElementById('f-form').value;
-    const patient = document.getElementById('f-patient').value.trim();
-    const decision = document.getElementById('f-decision').value.trim();
-    const errEl = document.getElementById('formError');
-    if (!drug || !conc || !form || !decision) {
-      errEl.textContent = 'يرجى تعبئة جميع الحقول المطلوبة *';
-      errEl.style.display = 'block';
-      return;
-    }
-    errEl.style.display = 'none';
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.textContent = 'جاري الإرسال...';
-    const now = new Date();
-    const timestamp = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    const reqNum = 'REQ-' + now.getTime().toString().slice(-6);
-    try {
-      await fetch(SCRIPT_URL, {
-        method: 'POST', mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reqNum, drug, conc, form, patient, decision, timestamp })
-      });
-    } catch(e) {}
-    document.getElementById('requestNum').textContent = reqNum;
-    document.getElementById('formContent').style.display = 'none';
-    document.getElementById('successMsg').style.display = 'block';
-    btn.disabled = false;
-    btn.textContent = 'إرسال الطلب';
-  }
+  function getStatusClass(s) { return s.includes('متوفر') ? 'available' : 'unavailable'; }
+  function getStatusColor(s) { return s.includes('متوفر') ? '#0a6e5c' : '#c0392b'; }
 
-  function resetForm() {
-    ['f-drug','f-conc','f-patient','f-decision'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('f-form').value = '';
-    document.getElementById('formContent').style.display = 'block';
-    document.getElementById('successMsg').style.display = 'none';
-  }
-
-  // ===== التنقل =====
-  function showPage(page) {
-    ['search','pinned','form'].forEach(p => {
-      document.getElementById(p + 'Page').style.display = p === page ? 'block' : 'none';
-      const btn = document.getElementById('nav-' + p);
-      if (btn) btn.classList.toggle('active', p === page);
-    });
-    if (page === 'pinned') renderPinned();
-  }
-
-  // ===== البحث الصوتي =====
-  function startVoiceSearch() {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      showToast('البحث الصوتي غير مدعوم في هذا المتصفح');
-      return;
-    }
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'ar-EG';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    const micBtn = document.getElementById('micBtn');
-    micBtn.classList.add('listening');
-    micBtn.textContent = '🔴';
-
-    recognition.start();
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      const input = document.getElementById('searchInput');
-      input.value = transcript;
-      searchQuery = transcript;
-      document.getElementById('clearBtn').style.display = 'block';
-      renderCards();
-    };
-
-    recognition.onend = () => {
-      micBtn.classList.remove('listening');
-      micBtn.textContent = '🎤';
-    };
-
-    recognition.onerror = () => {
-      micBtn.classList.remove('listening');
-      micBtn.textContent = '🎤';
-      showToast('لم يتم التعرف على الصوت، حاول مجدداً');
-    };
-  }
-
-  // ===== زيارات =====
-  async function loadVisitCount() {
-    try {
-      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent('إحصائيات الزيارات')}&range=A2`;
-      const res = await fetch(url);
-      const text = await res.text();
-      const json = JSON.parse(text.substring(47).slice(0, -2));
-      const count = json?.table?.rows[0]?.c[0]?.v || 0;
-      if (count > 0) {
-        document.getElementById('visitCounter').textContent = `👥 ${Math.round(count).toLocaleString('ar-EG')} زيارة`;
-      }
-    } catch(e) {}
-  }
-
-  // ===== منذ كذا =====
-  function timeAgo(dateStr) {
-    if (!dateStr) return '';
-    const ts = parseDate(dateStr);
-    if (!ts) return '';
-    const diff = Math.floor((Date.now() - ts) / 1000);
-    if (diff < 0) return 'منذ لحظات';
-    if (diff < 60) return 'منذ لحظات';
-    if (diff < 120) return 'منذ دقيقة';
-    if (diff < 3600) return `منذ ${Math.floor(diff/60)} دقيقة`;
-    if (diff < 7200) return 'منذ ساعة';
-    if (diff < 86400) return `منذ ${Math.floor(diff/3600)} ساعة`;
-    if (diff < 172800) return 'منذ يوم';
-    if (diff < 259200) return 'منذ يومين';
-    if (diff < 604800) return `منذ ${Math.floor(diff/86400)} أيام`;
-    if (diff < 1209600) return 'منذ أسبوع';
-    if (diff < 1814400) return 'منذ أسبوعين';
-    if (diff < 2592000) return `منذ ${Math.floor(diff/604800)} أسابيع`;
-    if (diff < 5184000) return 'منذ شهر';
-    if (diff < 7776000) return 'منذ شهرين';
-    return `منذ ${Math.floor(diff/2592000)} أشهر`;
-  }
-
-  // ===== إيموجي الشكل =====
-  function getFormEmoji(form) {
-    if (!form) return '📦';
-    if (form.includes('أقراص') || form.includes('كبسول')) return '💊';
-    if (form.includes('حقن') || form.includes('أمبول')) return '💉';
-    if (form.includes('شراب')) return '🧴';
-    if (form.includes('كريم') || form.includes('مرهم')) return '🩹';
-    return '📦';
-  }
-
-  // ===== أحداث البحث =====
-  document.getElementById('searchInput').addEventListener('input', function() {
-    searchQuery = this.value;
-    document.getElementById('clearBtn').style.display = searchQuery ? 'block' : 'none';
+  function togglePin(event, id) {
+    event.stopPropagation();
+    const idx = pinnedDrugs.indexOf(id);
+    if (idx > -1) pinnedDrugs.splice(idx, 1); else pinnedDrugs.push(id);
+    localStorage.setItem('pinnedDrugs', JSON.stringify(pinnedDrugs));
     renderCards();
-    clearTimeout(searchTimer);
-    if (searchQuery.trim().length > 2) {
-      searchTimer = setTimeout(() => {
-        getFilteredDrugs().forEach(d => logStats(d.activeName, d.concentration, 'search'));
-      }, 1500);
-    }
-  });
+  }
 
   function clearSearch() {
     document.getElementById('searchInput').value = '';
     searchQuery = '';
-    document.getElementById('clearBtn').style.display = 'none';
+    document.getElementById('didYouMean').style.display = 'none';
     renderCards();
   }
 
-  function setFilter(filter, btn) {
-    currentFilter = filter;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+  document.getElementById('searchInput').addEventListener('input', function() {
+    searchQuery = this.value;
     renderCards();
-  }
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      logStats(searchQuery || "فراغ", "بحث", "search");
+    }, 2000);
+  });
 
-  loadData();
+  window.onload = fetchDrugs;
 </script>
 </body>
 </html>
