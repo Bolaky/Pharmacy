@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>صيدلية نفقة الدولة - توفر الأدوية</title>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -764,12 +772,13 @@
   }
 
   // ===== صفحة التفاصيل =====
-  function openDetail(index, scrollTo = null) {
+  function openDetail(index, scrollTo = null, fromButton = false) {
     currentDetailIndex = index;
     const drug = allDrugs[index];
     if (!drug) return;
 
-    logStats(drug.activeName, drug.concentration, 'click');
+    // سجّل click فقط إذا لم يكن من زر
+    if (!fromButton) logStats(drug.activeName, drug.concentration, 'click');
 
     const status = normalizeStatus(drug.availability);
     document.getElementById('detailName').textContent = drug.activeName;
@@ -851,7 +860,7 @@
     if (drug && statType) {
       logStats(drug.activeName, drug.concentration, statType);
     }
-    openDetail(index, section);
+    openDetail(index, section, true); // true = من زر، لا تسجل click
   }
 
   function extractYoutubeId(url) {
