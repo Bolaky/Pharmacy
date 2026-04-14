@@ -1058,26 +1058,60 @@
     return results.sort((a,b) => a.score - b.score).slice(0, 3);
   }
 
+  function getSmartSuggestions(query) {
+    if (!query || query.length < 3) return [];
+    const q = query.toLowerCase();
+    const results = [];
+
+    allDrugs.forEach((drug, index) => {
+      const names = [drug.activeName, ...drug.tradeNames.split(',').map(n => n.trim())].filter(Boolean);
+      let bestScore = Infinity;
+      let bestMatchedName = '';
+
+      names.forEach(name => {
+        const n = name.toLowerCase();
+        if (n.includes(q)) { bestScore = 0; bestMatchedName = name; return; }
+        n.split(/[\s,]+/).forEach(word => {
+          if (word.length >= 3) {
+            const dist = levenshtein(q, word);
+            const threshold = q.length <= 4 ? 1 : q.length <= 7 ? 2 : 3;
+            if (dist <= threshold && dist < bestScore) {
+              bestScore = dist;
+              bestMatchedName = name;
+            }
+          }
+        });
+      });
+
+      if (bestScore < Infinity && bestScore > 0) {
+        results.push({ drug, index, score: bestScore, matchedName: bestMatchedName });
+      }
+    });
+
+    return results.sort((a,b) => a.score - b.score).slice(0, 3);
+  }
+
   function showSmartSuggestions(query) {
     const box = document.getElementById('smartSuggestion');
     const items = document.getElementById('smartSuggestionItems');
-
     const suggestions = getSmartSuggestions(query);
     if (!suggestions.length) { box.style.display = 'none'; return; }
 
-    const status_colors = { available: '#e8f5f0', unavailable: '#fdecea', limited: '#fef9e7', unlisted: '#e8f4fd' };
-    const status_text_colors = { available: '#0a6e5c', unavailable: '#c0392b', limited: '#d68910', unlisted: '#2980b9' };
+    const sc = { available:'#e8f5f0', unavailable:'#fdecea', limited:'#fef9e7', unlisted:'#e8f4fd' };
+    const tc = { available:'#0a6e5c', unavailable:'#c0392b', limited:'#d68910', unlisted:'#2980b9' };
 
-    items.innerHTML = suggestions.map(({drug, index}) => {
+    items.innerHTML = suggestions.map(({drug, index, matchedName}) => {
       const status = normalizeStatus(drug.availability);
-      const mainName = drug.tradeNames.split(',')[0]?.trim() || drug.activeName;
+      // حدد إذا كان الاسم المطابق تجارياً أو مادة فعالة
+      const isActive = matchedName === drug.activeName;
+      const label = isActive ? '🧪 مادة فعالة' : '🏷️ اسم تجاري';
       return `
         <div class="smart-suggestion-item" onclick="acceptSuggestion(${index})">
-          <div>
-            <div class="smart-suggestion-name">${mainName}</div>
-            <div class="smart-suggestion-sub">🧪 ${drug.activeName} • ${drug.concentration}</div>
+          <div style="flex:1">
+            <div class="smart-suggestion-name">${matchedName}</div>
+            <div class="smart-suggestion-sub">${label} • ${isActive ? drug.tradeNames.split(',')[0]?.trim() || '—' : drug.activeName} • ${drug.concentration}</div>
           </div>
-          <span class="smart-suggestion-badge" style="background:${status_colors[status.key]};color:${status_text_colors[status.key]}">${status.label}</span>
+          <span class="smart-suggestion-badge" style="background:${sc[status.key]};color:${tc[status.key]}">${status.label}</span>
         </div>`;
     }).join('');
 
