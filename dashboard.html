@@ -113,8 +113,8 @@
 </div>
 
 <script>
-const SHEET_ID='1j-iFjm2bZYdLAc_-VSQatuVyZCnp1z0gIoYGO52H_BA';
-const PASSWORD='13579';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbykjQpMVWHpp8B3hwjAoc7uSMUR8xaqLanQ1f27dFi6ZGIBxDytITaFC8ghsdqigcWb/exec';
+const PASSWORD='1234';
 let SR=[],VR=[],ZR=[];
 let period='all';
 let CH={};
@@ -144,11 +144,9 @@ function setPeriod(p,btn){
 }
 
 async function fetchSheet(name){
-  const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(name)}`;
-  const r=await fetch(url);
-  const t=await r.text();
-  const j=JSON.parse(t.substring(47).slice(0,-2));
-  return(j.table?.rows||[]).map(row=>(row.c||[]).map(c=>c?(c.v!==null?c.v:''):''));
+  const res = await fetch(`${SCRIPT_URL}?action=getSheet&sheet=${encodeURIComponent(name)}`);
+  const json = await res.json();
+  return json.data || [];
 }
 
 async function loadAll(){
