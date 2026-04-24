@@ -115,7 +115,7 @@
   .smart-suggestion-item:last-child { margin-bottom:0; }
   .smart-suggestion-item:hover { background:#fff3cd; }
   .smart-suggestion-name { font-size:14px; font-weight:700; color:var(--text); }
-  .smart-suggestion-sub { font-size:11px; color:var(--muted); }
+  .smart-suggestion-sub { font-size:11px; color:var(--text-muted); }
   .smart-suggestion-badge { font-size:11px; font-weight:700; padding:3px 8px; border-radius:8px; }
   .card-actions { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
   .card-action-btn { flex:1; min-width:80px; padding:7px 8px; border-radius:10px; border:1.5px solid var(--border); background:#fff; font-family:'Tajawal',sans-serif; font-size:11px; font-weight:600; color:var(--text-muted); cursor:pointer; transition:all 0.2s; text-align:center; }
@@ -386,4 +386,36 @@
       <div class="detail-section-title">🏷️ الأسماء التجارية المتاحة</div>
       <div id="d-tradeNames"></div>
     </div>
-    <div class="detail-section" id
+    <div class="detail-section" id="d-tips-section">
+      <div class="detail-section-title">📝 نصائح الاستخدام</div>
+      <div id="d-tips"></div>
+    </div>
+    <div class="detail-section" id="d-warnings-section">
+      <div class="detail-section-title">⚠️ تحذيرات</div>
+      <div id="d-warnings"></div>
+    </div>
+    <div class="detail-section" id="d-alts-therapeutic-section">
+      <div class="detail-section-title">🔄 بدائل المجموعة العلاجية</div>
+      <div id="d-alts-therapeutic"></div>
+    </div>
+    <div class="detail-section" id="d-alts-general-section">
+      <div class="detail-section-title">🔄 بدائل عامة</div>
+      <div id="d-alts-general"></div>
+    </div>
+    <div class="detail-section" id="d-video-section">
+      <div class="detail-section-title">🎥 فيديو شرح</div>
+      <div id="d-video"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===== الإعدادات الأساسية - التعديل الوحيد هنا =====
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbym9z2Hwa6C2t9_E1O3jhW4v0BiLNSFCchmREPjwcGrdQeBVsOilDXbNHPoETICK5lx/exec';
+  const API_TOKEN = 'Battle_of_the_Bastards@2026'; // ← غيره بعد ما الموقع يشتغل
+
+  let allDrugs = [];
+  let currentFilter = 'all';
+  let searchQuery = '';
+  let searchTimer = null;
+  let pinned
