@@ -52,10 +52,11 @@
   .ticker-item .ticker-status { color:#7fffcf; font-size:12px; margin-right:4px; }
 
   /* إعلانات الصيدلية */
-  .announcement-card { background:#fff8e1; border:1px solid #f0c419; border-radius:12px; padding:12px 14px; margin:10px 16px 0; }
-  .announcement-card + .announcement-card { margin-top:8px; }
-  .announcement-label { font-size:11px; font-weight:700; color:#8a6d00; margin-bottom:4px; display:flex; align-items:center; gap:4px; }
-  .announcement-text { font-size:13px; color:#5c4a00; line-height:1.7; }
+  .announcement-box { background:#fff8e1; border:2px solid #f0c419; border-radius:14px; padding:14px 16px; margin:14px 16px 0; box-shadow:0 2px 6px rgba(240,196,25,0.15); }
+  .announcement-box-title { font-size:14px; font-weight:800; color:#8a6d00; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+  .announcement-list { margin:0; padding-right:20px; list-style:disc; }
+  .announcement-list li { font-size:14px; font-weight:500; color:#4a3b00; line-height:1.9; margin-bottom:4px; }
+  .announcement-list li:last-child { margin-bottom:0; }
 
   /* تنويه */
   .notice-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center; padding:20px; }
@@ -443,7 +444,7 @@
   let currentDetailIndex = -1;
 
   // ===== إعلانات صيدلية نفقة الدولة =====
-  // الشيت "إعلانات": عمود A = نص الرسالة، عمود B = فعّال؟ (نعم/لا)
+  // الشيت "إعلانات": عمود A = نص الرسالة، عمود B = فعّال؟ (نعم/لا)، عمود C = الترتيب (رقم)
   async function loadAnnouncements() {
     try {
       const res = await fetch(ANNOUNCEMENTS_URL);
@@ -454,9 +455,11 @@
       const messages = rows
         .map(row => ({
           text: getCellValue(row, 0),
-          active: getCellValue(row, 1)
+          active: getCellValue(row, 1),
+          order: parseFloat(getCellValue(row, 2)) || 9999
         }))
-        .filter(m => m.text && m.text.trim() && (!m.active || ['نعم','yes','true','1'].includes(m.active.trim().toLowerCase())));
+        .filter(m => m.text && m.text.trim() && (!m.active || ['نعم','yes','true','1'].includes(m.active.trim().toLowerCase())))
+        .sort((a, b) => a.order - b.order);
 
       const wrap = document.getElementById('announcementsWrap');
       if (!messages.length) {
@@ -465,12 +468,14 @@
         return;
       }
 
-      wrap.innerHTML = messages.map(m => `
-        <div class="announcement-card">
-          <div class="announcement-label">📢 إعلان من الصيدلية</div>
-          <div class="announcement-text">${m.text}</div>
+      wrap.innerHTML = `
+        <div class="announcement-box">
+          <div class="announcement-box-title">📢 إعلانات وتنويهات</div>
+          <ul class="announcement-list">
+            ${messages.map(m => `<li>${m.text}</li>`).join('')}
+          </ul>
         </div>
-      `).join('');
+      `;
       wrap.style.display = 'block';
     } catch (e) {
       // في حالة عدم وجود الشيت أو أي خطأ، الموقع يستمر عادي بدون إعلانات
